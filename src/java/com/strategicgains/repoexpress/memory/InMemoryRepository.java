@@ -18,6 +18,7 @@ package com.strategicgains.repoexpress.memory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.strategicgains.repoexpress.AbstractObservableRepository;
 import com.strategicgains.repoexpress.domain.Identifiable;
@@ -31,8 +32,8 @@ import com.strategicgains.repoexpress.exception.ItemNotFoundException;
 public abstract class InMemoryRepository<T extends Identifiable>
 extends AbstractObservableRepository<T>
 {
-	private static long nextId = 0;
-	private Map<String, T> items = new ConcurrentHashMap<String, T>();
+	private static AtomicLong nextId = new AtomicLong(0);
+	protected Map<String, T> items = new ConcurrentHashMap<String, T>();
 
 	@Override
 	public T doCreate(T item)
@@ -51,7 +52,7 @@ extends AbstractObservableRepository<T>
 		}
 		else
 		{
-			item.setId(item.getClass().getSimpleName() + ++nextId);
+			item.setId(item.getClass().getSimpleName() + nextId.incrementAndGet());
 		}
 
 		items.put(item.getId(), item);

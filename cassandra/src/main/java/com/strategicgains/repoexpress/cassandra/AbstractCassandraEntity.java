@@ -15,11 +15,6 @@ import com.strategicgains.repoexpress.event.UuidIdentityRepositoryObserver;
  * {@link DefaultTimestampedIdentifiableRepositoryObserver} to set the createAt and 
  * updatedAt dates on the object as appropriate.
  * <p/>
- * Storing a UUID using Easy-Cassandra (as this repository does) requires four (4) bytes for the ID,
- * whereas, using a Cassandra ObjectId only requires three (3).  However, a UUID, shortened to
- * 22 characters (using Base64 encoding) is arguably more readable and universally applicable
- * on a URL.
- * <p/>
  * To implement single-table inheritance, simply pass in all the sub-classes that
  * exist in this collection, with the inheritance-root listed first.
  * @author dinusha

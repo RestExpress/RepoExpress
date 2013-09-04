@@ -15,7 +15,6 @@
 */
 package com.strategicgains.repoexpress.event;
 
-import com.strategicgains.repoexpress.domain.Identifiable;
 
 /**
  * This default implementation does nothing, but allows sub-classes to
@@ -24,7 +23,7 @@ import com.strategicgains.repoexpress.domain.Identifiable;
  * @author toddf
  * @since Oct 13, 2009
  */
-public abstract class AbstractRepositoryObserver<T extends Identifiable>
+public abstract class AbstractRepositoryObserver<T>
 implements RepositoryObserver<T>
 {
 	@Override

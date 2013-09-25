@@ -60,6 +60,16 @@ extends AbstractObservableRepository<T>
 	@Override
 	public T doCreate(T item)
 	{
+		return doCreate(item, -1);
+	}
+
+	protected T doCreate(T item, int ttlSeconds)
+	{
+		//Item expires immediately, so no sense in storing it.
+		if (ttlSeconds == 0)
+		{
+			return item;
+		}
 		if (exists(item.getId()))
 		{
 			throw new DuplicateItemException(item.getClass().getSimpleName()
@@ -70,7 +80,7 @@ extends AbstractObservableRepository<T>
 		
 		try
 		{
-			if (!jedis.set(item.getId(), marshalFrom(item)).equalsIgnoreCase("OK"))
+			if (!jedis.setex(item.getId(), ttlSeconds, marshalFrom(item)).equalsIgnoreCase("OK"))
 			{
 				throw new RepositoryException("Error creating object: " + item.getId());
 			}
@@ -128,6 +138,11 @@ extends AbstractObservableRepository<T>
 	@Override
 	public T doUpdate(T item)
 	{
+		return doUpdate(item, -1);
+	}
+
+	protected T doUpdate(T item, int ttlSeconds)
+	{
 		if (!exists(item.getId()))
 		{
 			throw new ItemNotFoundException(item.getClass().getSimpleName()
@@ -138,7 +153,7 @@ extends AbstractObservableRepository<T>
 		
 		try
 		{
-			if (!jedis.set(item.getId(), marshalFrom(item)).equalsIgnoreCase("OK"))
+			if (!jedis.setex(item.getId(), ttlSeconds, marshalFrom(item)).equalsIgnoreCase("OK"))
 			{
 				throw new RepositoryException("Error updating object: " + item.getId());
 			}

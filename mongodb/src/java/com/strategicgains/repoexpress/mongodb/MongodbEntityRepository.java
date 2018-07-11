@@ -33,7 +33,7 @@ import com.strategicgains.repoexpress.event.DefaultTimestampedIdentifiableReposi
 public class MongodbEntityRepository<T extends TimestampedIdentifiable>
 extends MongodbRepository<T>
 {
-    public MongodbEntityRepository(MongoClient mongo, String databaseName, Class<? extends T>... types)
+    public MongodbEntityRepository(MongoClient mongo, String databaseName, @SuppressWarnings("unchecked") Class<? extends T>... types)
     {
 	    super(mongo, databaseName, types);
 		initializeObservers();

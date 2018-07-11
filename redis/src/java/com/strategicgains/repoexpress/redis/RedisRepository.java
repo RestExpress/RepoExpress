@@ -98,7 +98,7 @@ extends AbstractObservableRepository<T>
 		}
 		finally
 		{
-			jedisPool.returnResource(jedis);
+			jedis.close();
 		}
 	}
 
@@ -118,7 +118,7 @@ extends AbstractObservableRepository<T>
 		}
 		finally
 		{
-			jedisPool.returnResource(jedis);
+			jedis.close();
 		}
 	}
 
@@ -140,7 +140,7 @@ extends AbstractObservableRepository<T>
 		}
 		finally
 		{
-			jedisPool.returnResource(jedis);
+			jedis.close();
 		}
 	}
 
@@ -171,7 +171,7 @@ extends AbstractObservableRepository<T>
 		}
 		finally
 		{
-			jedisPool.returnResource(jedis);
+			jedis.close();
 		}
 	}
 
@@ -188,7 +188,7 @@ extends AbstractObservableRepository<T>
 		}
 		finally
 		{
-			jedisPool.returnResource(jedis);
+			jedis.close();
 		}
 	}
 

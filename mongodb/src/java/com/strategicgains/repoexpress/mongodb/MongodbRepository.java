@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
+import org.mongodb.morphia.query.FindOptions;
 import org.mongodb.morphia.query.Query;
 import org.restexpress.common.query.FilterCallback;
 import org.restexpress.common.query.FilterComponent;
@@ -62,7 +63,7 @@ implements Queryable<T>
 	 * @param dbName the name of the database (in MongoDB).
 	 * @param entityClasses Class(es) managed by this repository. Inheritance root first.
 	 */
-	public MongodbRepository(MongoClient mongo, String dbName, Class<? extends T>... entityClasses)
+	public MongodbRepository(MongoClient mongo, String dbName, @SuppressWarnings("unchecked") Class<? extends T>... entityClasses)
 	{
 		super();
 		this.mongo = mongo;
@@ -204,7 +205,7 @@ implements Queryable<T>
 	 */
 	public long count(Class<T> type, QueryFilter filter)
 	{
-		return getBaseFilterQuery(type, filter).countAll();
+		return getBaseFilterQuery(type, filter).count();
 	}
 
 	/**
@@ -217,7 +218,7 @@ implements Queryable<T>
 	{
 		if (id == null) return false;
 
-		return (datastore.getCount(datastore.find(inheritanceRoot, "_id", id.firstComponent())) > 0);
+		return (datastore.getCount(datastore.find(inheritanceRoot).filter("_id", id.firstComponent())) > 0);
 
 		// is the above line more efficient, or the following one?
 //		return (datastore.find(inheritanceRoot, "_id", adaptId(id)).countAll() > 0);
@@ -257,7 +258,9 @@ implements Queryable<T>
 	 */
 	protected List<T> query(Class<T> type, QueryFilter filter, QueryRange range, QueryOrder order)
 	{
-		return getBaseQuery(type, filter, range, order).asList();
+		FindOptions options = new FindOptions();
+		configureQueryRange(options, range);
+		return getBaseQuery(type, filter, order).asList(options);
 	}
 
 	/**
@@ -265,14 +268,12 @@ implements Queryable<T>
 	 * criteria, returning the query.
 	 * 
 	 * @param type
-	 * @param range
 	 * @param filter
 	 * @param order
 	 */
-	protected Query<T> getBaseQuery(Class<T> type, QueryFilter filter, QueryRange range, QueryOrder order)
+	protected Query<T> getBaseQuery(Class<T> type, QueryFilter filter, QueryOrder order)
 	{
 		Query<T> q = getBaseFilterQuery(type, filter);
-		configureQueryRange(q, range);
 		configureQueryOrder(q, order);
 		return q;
 	}
@@ -292,17 +293,17 @@ implements Queryable<T>
 	}
 
 	/**
-	 * @param q
+	 * @param o
 	 * @param range
 	 */
-	private void configureQueryRange(Query<T> q, QueryRange range)
+	private void configureQueryRange(FindOptions o, QueryRange range)
 	{
 		if (range == null) return;
 
 		if (range.isInitialized())
 		{
-			q.offset((int) range.getStart());
-			q.limit(range.getLimit());
+			o.skip((int) range.getStart());
+			o.limit(range.getLimit());
 		}
 	}
 
@@ -386,5 +387,12 @@ implements Queryable<T>
 			
 			q.order(sb.toString());
 		}
+	}
+	
+	/**
+	 * @return morphia
+	 */
+	public Morphia getMorphia() {
+		return morphia;
 	}
 }

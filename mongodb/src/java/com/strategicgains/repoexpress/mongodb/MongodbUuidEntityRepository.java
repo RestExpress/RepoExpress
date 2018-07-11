@@ -41,7 +41,7 @@ import com.strategicgains.repoexpress.event.UuidEntityRepositoryObserver;
 public class MongodbUuidEntityRepository<T extends TimestampedIdentifiable & UuidEntity>
 extends MongodbRepository<T>
 {
-    public MongodbUuidEntityRepository(MongoClient mongo, String databaseName, Class<? extends T>... types)
+    public MongodbUuidEntityRepository(MongoClient mongo, String databaseName, @SuppressWarnings("unchecked") Class<? extends T>... types)
     {
 	    super(mongo, databaseName, types);
 		initializeObservers();

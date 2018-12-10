@@ -256,10 +256,45 @@ implements Queryable<T>
 	 */
 	protected List<T> query(Class<T> type, QueryFilter filter, QueryRange range, QueryOrder order)
 	{
+		Query<T> q = getBaseQuery(type, filter, order);
+		FindOptions fo = createFindOptions(range);
+		return (fo != null ? q.asList(fo) : q.asList());
+	}
+
+	/**
+	 * Creates a base query with ordering configured, if present. To support limit and offset (range)
+	 * in the query, call createFindOptions(QueryRange) and pass it in to the asList(FindOptions) call
+	 * if not null.
+	 * 
+	 * @param type
+	 * @param filter
+	 * @param order
+	 * @return a new Query instance
+	 * @see createFindOptions(QueryRange)
+	 */
+	protected Query<T> getBaseQuery(Class<T> type, QueryFilter filter, QueryOrder order)
+	{
 		Query<T> q = getBaseFilterQuery(type, filter);
 		configureQueryOrder(q, order);
-		FindOptions fo = configureQueryRange(range);
-		return (fo != null ? q.asList(fo) : q.asList());
+		return q;
+	}
+
+	/**
+	 * @param range a QueryRange instance.
+	 * @return a configured FindOptions if the range is initialized. Or null, if not.
+	 */
+	protected FindOptions createFindOptions(QueryRange range)
+	{
+		if (range == null) return null;
+
+		if (range.isInitialized())
+		{
+			return new FindOptions()
+				.skip((int) range.getStart())
+				.limit(range.getLimit());
+		}
+
+		return null;
 	}
 
 	/**
@@ -274,24 +309,6 @@ implements Queryable<T>
 		Query<T> q = getDataStore().find(type);
 		configureQueryFilter(q, filter);
 		return q;
-	}
-
-	/**
-	 * @param o
-	 * @param range
-	 */
-	private FindOptions configureQueryRange(QueryRange range)
-	{
-		if (range == null) return null;
-
-		if (range.isInitialized())
-		{
-			return new FindOptions()
-				.skip((int) range.getStart())
-				.limit(range.getLimit());
-		}
-
-		return null;
 	}
 
 	private void configureQueryFilter(final Query<T> q, QueryFilter filter)

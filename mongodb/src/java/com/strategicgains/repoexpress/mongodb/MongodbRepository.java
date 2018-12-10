@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
+import org.mongodb.morphia.query.FindOptions;
 import org.mongodb.morphia.query.Query;
 import org.restexpress.common.query.FilterCallback;
 import org.restexpress.common.query.FilterComponent;
@@ -62,6 +63,7 @@ implements Queryable<T>
 	 * @param dbName the name of the database (in MongoDB).
 	 * @param entityClasses Class(es) managed by this repository. Inheritance root first.
 	 */
+	@SuppressWarnings("unchecked")
 	public MongodbRepository(MongoClient mongo, String dbName, Class<? extends T>... entityClasses)
 	{
 		super();
@@ -101,7 +103,7 @@ implements Queryable<T>
 	@Override
 	public T doRead(Identifier id)
 	{
-		T item = datastore.get(inheritanceRoot, id.firstComponent());
+		T item = datastore.get(inheritanceRoot, id.lastComponent());
 
 		if (item == null)
 		{
@@ -204,7 +206,7 @@ implements Queryable<T>
 	 */
 	public long count(Class<T> type, QueryFilter filter)
 	{
-		return getBaseFilterQuery(type, filter).countAll();
+		return getBaseFilterQuery(type, filter).count();
 	}
 
 	/**
@@ -217,10 +219,10 @@ implements Queryable<T>
 	{
 		if (id == null) return false;
 
-		return (datastore.getCount(datastore.find(inheritanceRoot, "_id", id.firstComponent())) > 0);
+		return (datastore.getCount(datastore.find(inheritanceRoot).field("_id").equal(id.lastComponent())) > 0);
 
 		// is the above line more efficient, or the following one?
-//		return (datastore.find(inheritanceRoot, "_id", adaptId(id)).countAll() > 0);
+//		return (datastore.find(inheritanceRoot, "_id", adaptId(id)).count() > 0);
 	}
 
 
@@ -257,24 +259,10 @@ implements Queryable<T>
 	 */
 	protected List<T> query(Class<T> type, QueryFilter filter, QueryRange range, QueryOrder order)
 	{
-		return getBaseQuery(type, filter, range, order).asList();
-	}
-
-	/**
-	 * Create and configure a basic query utilizing provided QueryFilter, QueryRange and QueryOrder
-	 * criteria, returning the query.
-	 * 
-	 * @param type
-	 * @param range
-	 * @param filter
-	 * @param order
-	 */
-	protected Query<T> getBaseQuery(Class<T> type, QueryFilter filter, QueryRange range, QueryOrder order)
-	{
 		Query<T> q = getBaseFilterQuery(type, filter);
-		configureQueryRange(q, range);
 		configureQueryOrder(q, order);
-		return q;
+		FindOptions fo = configureQueryRange(range);
+		return (fo != null ? q.asList(fo) : q.asList());
 	}
 
 	/**
@@ -295,15 +283,18 @@ implements Queryable<T>
 	 * @param q
 	 * @param range
 	 */
-	private void configureQueryRange(Query<T> q, QueryRange range)
+	private FindOptions configureQueryRange(QueryRange range)
 	{
-		if (range == null) return;
+		if (range == null) return null;
 
 		if (range.isInitialized())
 		{
-			q.offset((int) range.getStart());
-			q.limit(range.getLimit());
+			return new FindOptions()
+				.skip((int) range.getStart())
+				.limit(range.getLimit());
 		}
+
+		return null;
 	}
 
 	private void configureQueryFilter(final Query<T> q, QueryFilter filter)

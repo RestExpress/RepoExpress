@@ -220,9 +220,6 @@ implements Queryable<T>
 		if (id == null) return false;
 
 		return (datastore.getCount(datastore.find(inheritanceRoot).field("_id").equal(id.lastComponent())) > 0);
-
-		// is the above line more efficient, or the following one?
-//		return (datastore.find(inheritanceRoot, "_id", adaptId(id)).count() > 0);
 	}
 
 
@@ -280,7 +277,7 @@ implements Queryable<T>
 	}
 
 	/**
-	 * @param q
+	 * @param o
 	 * @param range
 	 */
 	private FindOptions configureQueryRange(QueryRange range)
@@ -377,5 +374,12 @@ implements Queryable<T>
 			
 			q.order(sb.toString());
 		}
+	}
+	
+	/**
+	 * @return morphia
+	 */
+	public Morphia getMorphia() {
+		return morphia;
 	}
 }

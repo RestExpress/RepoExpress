@@ -50,7 +50,7 @@ Development:
 ```
 
 Redis Usage
-=============
+===========
 Stable:
 ```xml
 		<dependency>
@@ -91,7 +91,8 @@ Note that to use the SNAPSHOT Maven versions mentioned above, you must enable sn
 ```
 
 Change History:
-===================================================================================================
+===============
+
 Release 1.0.0-SNAPSHOT
 ----------------------
 * Yuge refactoring for V1. Changed semantics of Identifiable to return a fully-qualified identifier. Entity, which Identifiable, has object ID properties: getId() and setId(T).
@@ -104,7 +105,7 @@ Release 1.0.0-SNAPSHOT
 * InMemoryRepository no longer assigns IDs and, instead, expects the ID to be set on the incoming object. Throws exception if not.
 * Upgraded to Morphia 1.3.2
 * Upgraded to Jedis 2.9.0
-* Upgreade to DataStax driver 3.4.0
+* Upgraded to DataStax driver 3.6.0
 
 Release 0.4.8 - 10 Feb 2016
 ---------------------------

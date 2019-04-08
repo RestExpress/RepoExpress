@@ -10,17 +10,23 @@ import com.mongodb.MongoClientURI;
 public class MongoConfig
 {
 	private static final String URI_PROPERTY = "mongodb.uri";
+	private static final String URI_ENVIRONMENT_PROPERTY = "MONGODB_URI";
 
 	private String dbName;
 	private MongoClient client;
 
     public MongoConfig(Properties p)
     {
-		String uri = p.getProperty(URI_PROPERTY);
+		String uri = p.getProperty(URI_ENVIRONMENT_PROPERTY);
 
 		if (uri == null)
 		{
-			throw new ConfigurationException("Please define a MongoDB URI for property: " + URI_PROPERTY);
+			uri = p.getProperty(URI_PROPERTY);
+		}
+
+		if (uri == null)
+		{
+			throw new ConfigurationException(String.format("Please define a MongoDB URI for property: %s or %s", URI_PROPERTY, URI_ENVIRONMENT_PROPERTY));
 		}
 
 		MongoClientURI mongoUri = new MongoClientURI(uri);

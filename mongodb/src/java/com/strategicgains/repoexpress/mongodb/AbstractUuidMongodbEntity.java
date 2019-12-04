@@ -17,7 +17,7 @@ package com.strategicgains.repoexpress.mongodb;
 
 import java.util.UUID;
 
-import org.mongodb.morphia.annotations.Id;
+import dev.morphia.annotations.Id;
 
 import com.strategicgains.repoexpress.domain.AbstractTimestampedEntity;
 import com.strategicgains.repoexpress.domain.Identifier;

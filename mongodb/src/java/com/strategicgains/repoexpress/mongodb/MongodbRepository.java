@@ -15,13 +15,10 @@
 */
 package com.strategicgains.repoexpress.mongodb;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.query.FindOptions;
-import org.mongodb.morphia.query.Query;
 import org.restexpress.common.query.FilterCallback;
 import org.restexpress.common.query.FilterComponent;
 import org.restexpress.common.query.OrderCallback;
@@ -30,7 +27,6 @@ import org.restexpress.common.query.QueryFilter;
 import org.restexpress.common.query.QueryOrder;
 import org.restexpress.common.query.QueryRange;
 
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.strategicgains.repoexpress.AbstractObservableRepository;
 import com.strategicgains.repoexpress.Queryable;
@@ -39,6 +35,12 @@ import com.strategicgains.repoexpress.domain.Identifier;
 import com.strategicgains.repoexpress.exception.DuplicateItemException;
 import com.strategicgains.repoexpress.exception.InvalidObjectIdException;
 import com.strategicgains.repoexpress.exception.ItemNotFoundException;
+
+import dev.morphia.Datastore;
+import dev.morphia.Morphia;
+import dev.morphia.query.FindOptions;
+import dev.morphia.query.Query;
+import dev.morphia.query.Sort;
 
 /**
  * Uses MongoDB as its back-end store to persist Identifiable implementations.
@@ -103,7 +105,7 @@ implements Queryable<T>
 	@Override
 	public T doRead(Identifier id)
 	{
-		T item = datastore.get(inheritanceRoot, id.lastComponent());
+		T item = datastore.find(inheritanceRoot).field("_id").equal(id.lastComponent()).first();
 
 		if (item == null)
 		{
@@ -184,7 +186,7 @@ implements Queryable<T>
 	@Override
 	public List<T> readList(Collection<Identifier> ids)
 	{
-		return getDataStore().find(inheritanceRoot).field("_id").in(new PrimaryIdIterable(ids)).asList();
+		return getDataStore().createQuery(inheritanceRoot).field("_id").in(new PrimaryIdIterable(ids)).find().toList();
 	}
 
 	/**
@@ -219,7 +221,7 @@ implements Queryable<T>
 	{
 		if (id == null) return false;
 
-		return (datastore.getCount(datastore.find(inheritanceRoot).field("_id").equal(id.lastComponent())) > 0);
+		return (datastore.find(inheritanceRoot).field("_id").equal(id.lastComponent()).count() > 0);
 	}
 
 
@@ -240,7 +242,7 @@ implements Queryable<T>
 	 * 
 	 * @return the underlying Mongo instance.
 	 */
-	protected Mongo getMongo()
+	protected MongoClient getMongo()
 	{
 		return mongo;
 	}
@@ -258,7 +260,7 @@ implements Queryable<T>
 	{
 		Query<T> q = getBaseQuery(type, filter, order);
 		FindOptions fo = createFindOptions(range);
-		return (fo != null ? q.asList(fo) : q.asList());
+		return (fo != null ? q.find(fo).toList() : q.find().toList());
 	}
 
 	/**
@@ -365,35 +367,31 @@ implements Queryable<T>
 
 		if (order.isSorted())
 		{
-			final StringBuilder sb = new StringBuilder();
+			final ArrayList<Sort> sorts = new ArrayList<>();
 			
 			order.iterate(new OrderCallback()
 			{
-				boolean isFirst = true;
-
 				@Override
 				public void orderBy(OrderComponent component)
 				{
-					if (!isFirst)
-					{
-						sb.append(',');
-					}
-					
 					if (component.isDescending())
 					{
-						sb.append('-');
+						sorts.add(Sort.descending(component.getFieldName()));
 					}
-
-					sb.append(component.getFieldName());
-					isFirst = false;
+					else
+					{
+						sorts.add(Sort.ascending(component.getFieldName()));
+					}
 				}
 			});
 			
-			q.order(sb.toString());
+			q.order(sorts.toArray(new Sort[0]));
 		}
 	}
 	
 	/**
+	 * Get the underlying Morphia instance.
+	 * 
 	 * @return morphia
 	 */
 	public Morphia getMorphia() {

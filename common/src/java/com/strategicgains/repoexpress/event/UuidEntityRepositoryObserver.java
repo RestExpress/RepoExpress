@@ -43,7 +43,7 @@ extends AbstractRepositoryObserver<T>
 	@Override
 	public void beforeUpdate(T entity)
 	{
-		if (entity.getId() == null)
+		if (!entity.hasId())
 		{
 			throw new InvalidObjectIdException("UUID required on update");
 		}

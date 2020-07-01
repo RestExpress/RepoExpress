@@ -16,7 +16,8 @@
 package com.strategicgains.repoexpress.domain;
 
 /**
- * An entity (has an {@link Identifier}) as well as a single Object ID ('id' property).
+ * An entity (has an {@link Identifier}) as well as a single Object ID ('id'
+ * property).
  * 
  * @author toddf
  * @since Oct 6, 2017
@@ -30,8 +31,8 @@ implements Entity<T>
 	private T id;
 
 	/**
-	 * The default implementation returns the Object ID ('id' property) as the single
-	 * component of the Identifier.
+	 * The default implementation returns the Object ID ('id' property) as the
+	 * single component of the Identifier.
 	 */
 	@Override
 	public Identifier getIdentifier()
@@ -44,18 +45,29 @@ implements Entity<T>
 	 * 
 	 * @return the entity's object ID.
 	 */
-    public T getId()
-    {
-	    return id;
-    }
+	public T getId()
+	{
+		return id;
+	}
 
-    /**
-     * Set the object ID for this Entity.
-     * 
-     * @param objectId the new object ID.
-     */
-    public void setId(T objectId)
-    {
+	/**
+	 * Answers whether the object ID for this Entity is populated.
+	 * 
+	 * @return true if the entity's ID property is non-null. Otherwise, false.
+	 */
+	public boolean hasId()
+	{
+		return (id != null);
+	}
+
+	/**
+	 * Set the object ID for this Entity.
+	 * 
+	 * @param objectId
+	 *            the new object ID.
+	 */
+	public void setId(T objectId)
+	{
 		this.id = objectId;
-    }
+	}
 }

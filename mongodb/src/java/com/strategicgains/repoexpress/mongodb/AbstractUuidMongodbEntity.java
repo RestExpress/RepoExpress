@@ -24,8 +24,8 @@ import com.strategicgains.repoexpress.domain.Identifier;
 import com.strategicgains.repoexpress.domain.UuidEntity;
 
 /**
- * An MongoDB entity object that is identified by a UUID as its primary identifier.
- * It also has createdAt and updatedAt properties.
+ * An MongoDB entity object that is identified by a UUID as its primary
+ * identifier. It also has createdAt and updatedAt properties.
  * 
  * @author toddf
  * @since Mar 18, 2013
@@ -44,14 +44,20 @@ implements UuidEntity
 	}
 
 	@Override
-    public UUID getId()
-    {
-	    return id;
-    }
+	public UUID getId()
+	{
+		return id;
+	}
 
 	@Override
-    public void setId(UUID uuid)
-    {
+	public boolean hasId()
+	{
+		return (id != null);
+	}
+
+	@Override
+	public void setId(UUID uuid)
+	{
 		this.id = uuid;
-    }
+	}
 }

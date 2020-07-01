@@ -26,5 +26,6 @@ public interface Entity<T>
 extends Identifiable
 {
 	public T getId();
+	public boolean hasId();
 	public void setId(T oid);
 }

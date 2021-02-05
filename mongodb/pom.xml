@@ -27,10 +27,10 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>dev.morphia.morphia</groupId>
-			<artifactId>core</artifactId>
-			<version>1.6.1</version>
-		</dependency>
+	        <groupId>dev.morphia.morphia</groupId>
+	        <artifactId>core</artifactId>
+	        <version>1.6.1</version>
+	    </dependency>
    	</dependencies>
 
 	<build>

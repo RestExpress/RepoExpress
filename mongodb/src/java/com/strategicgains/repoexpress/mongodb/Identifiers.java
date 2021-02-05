@@ -19,7 +19,7 @@ package com.strategicgains.repoexpress.mongodb;
  * @author toddf
  * @since Jan 24, 2014
  */
-public abstract class Identifiers
+public interface Identifiers
 extends com.strategicgains.repoexpress.adapter.Identifiers
 {
 	public static final ObjectIdAdapter MONGOID = new ObjectIdAdapter();

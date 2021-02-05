@@ -28,6 +28,11 @@ import com.strategicgains.repoexpress.domain.Identifier;
  */
 public abstract class Format
 {
+	private Format()
+	{
+		// Prevents instantiation
+	}
+
 	/**
 	 * Format a UUID as a string. Possibly a short UUID (URL-Safe Base64-encoded).
 	 * 
@@ -40,14 +45,28 @@ public abstract class Format
 	}
 
 	/**
-	 * Format an Identifier instance containing a UUID as a string. Possibly a short UUID (URL-Safe Base64-encoded).
+	 * Format an Identifier instance as a string, with it's components separated by the default delimiter.
+	 * If the Identifier contains UUIDs, it will be shortened based on the UUID shortening settings (e.g. URL-Safe Base64-encoded).
 	 * 
-	 * @param id an Identifier instance containing a UUID.
-	 * @return a string representation of the UUID.
+	 * @param id an Identifier instance.
+	 * @return a string representation of the Identifier components.
 	 */
 	public static String id(Identifier id)
 	{
-		return Identifiers.UUID.format(id);
+		return Identifiers.format(id);
+	}
+
+	/**
+	 * Format an Identifier instance as a string, with it's components separated by the given delimiter.
+	 * If the Identifier contains UUIDs, it will be shortened based on the UUID shortening settings (e.g. URL-Safe Base64-encoded).
+	 * 
+	 * @param id an Identifier instance.
+	 * @param separator a String to use in delimiting the Identifier components.
+	 * @return a string representation of the Identifier components.
+	 */
+	public static String id(Identifier id, String separator)
+	{
+		return Identifiers.format(id, separator);
 	}
 
 	/**

@@ -15,17 +15,44 @@
 */
 package com.strategicgains.repoexpress.adapter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.restexpress.common.util.StringUtils;
+
+import com.strategicgains.repoexpress.domain.Identifier;
+
 /**
  * An abstract class with static singleton references to common ID adapters.
  * 
  * @author toddf
  * @since Jan 24, 2014
  */
-public abstract class Identifiers
+public interface Identifiers
 {
+	public static final String SEPARATOR = ":";
+
 	public static final UuidAdapter UUID = new UuidAdapter();
 	public static final StringToIntegerIdAdapter INTEGER = new StringToIntegerIdAdapter();
 	public static final StringToLongIdAdapter LONG = new StringToLongIdAdapter();
+
+	public static String format(Identifier id)
+	{
+		return format(id, SEPARATOR);
+	}
+
+	public static String format(Identifier id, String separator)
+	{
+		List<String> components = new ArrayList<>(id.size());
+
+		id.components().stream().forEach(c -> {
+			if (c instanceof UUID) components.add(UUID.format((UUID) c));
+			else components.add(c.toString());
+		});
+
+		return StringUtils.join(separator, components);
+	}
 
 	public static void useShortUUID()
 	{

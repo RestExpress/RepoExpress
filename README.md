@@ -1,7 +1,3 @@
-**Build Status** [![Build Status](https://buildhive.cloudbees.com/job/RestExpress/job/RepoExpress/badge/icon)](https://buildhive.cloudbees.com/job/RestExpress/job/RepoExpress/)
-
-**Waffle.io** [![Stories in Ready](https://badge.waffle.io/RestExpress/RepoExpress.png?label=ready)](https://waffle.io/RestExpress/RepoExpress)
-
 RepoExpress is a set of thin wrappers to provide a simple and easy way to create
 domain storage (CRUD persistence) options using the Repository pattern against NoSQL
 databases. There are various repositories supporting MongoDB, Redis, and Cassandra.
@@ -27,7 +23,7 @@ Development:
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 ```
-Or download the 'stable' jar directly from: 
+Or download the 'stable' jar directly from:
 http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22RepoExpress%22
 
 Cassandra Usage
@@ -67,7 +63,7 @@ Development:
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 ```
-Or download the 'stable' jar directly from: 
+Or download the 'stable' jar directly from:
 http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22RepoExpress%22
 
 About Maven Snapshots
@@ -98,14 +94,15 @@ Release 1.0.0-SNAPSHOT
 * Yuge refactoring for V1. Changed semantics of Identifiable to return a fully-qualified identifier. Entity, which Identifiable, has object ID properties: getId() and setId(T).
 * Introduced Entity<T> interface and AbstractEntity<T> implementation.
 * Introduced CreatedAt and UpdatedAt interfaces. Changed Timestamped to extend them.
+* Format.id(Identifier) now converts all the components to a joined string, shortening UUIDs if requested by Identifiers.useShortUUID().
 * Renamed UuidIdentifiable to UuidEntity and TimestampedUuidIdentifiable to TimestampedUuidEntity.
 * Introduced AbstractTimestampedUuidEntity.
 * Renamed Identifier.primaryKey() to firstComponent(). Added lastComponent(). Removed Identifier.setId(), renamed setId(Identifier) to setIdentifier(Identifier).
 * Renamed AbstractTimestampedIdentifiable to AbstractTimestampedEntity. Changed inheritance hierarchy.
 * InMemoryRepository no longer assigns IDs and, instead, expects the ID to be set on the incoming object. Throws exception if not.
-* Upgraded to Morphia 1.3.2
-* Upgraded to Jedis 2.9.0
-* Upgraded to DataStax driver 3.6.0
+* Upgraded to Morphia 1.6.1
+* Upgraded to Jedis 3.5.1
+* Upgraded to DataStax driver 3.10.2
 
 Release 0.4.8 - 10 Feb 2016
 ---------------------------

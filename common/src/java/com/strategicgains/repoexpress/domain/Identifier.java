@@ -21,7 +21,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.restexpress.common.util.ObjectUtils;
-import org.restexpress.common.util.StringUtils;
+
+import com.strategicgains.repoexpress.util.Format;
 
 /**
  * Supports the concept of a compound identifier. An Identifier is made up of components, which
@@ -35,7 +36,7 @@ implements Comparable<Identifier>
 {
 	private static final String SEPARATOR = ", ";
 
-	private List<Object> components = new ArrayList<Object>();
+	private List<Object> components = new ArrayList<>();
 
 	/**
 	 * Create an empty identifier.
@@ -135,6 +136,9 @@ implements Comparable<Identifier>
 	@Override
 	public boolean equals(Object that)
 	{
+		if (that == null) return false;
+		if (this.getClass() != that.getClass()) return false;
+
 		return (compareTo((Identifier) that) == 0);
 	}
 
@@ -176,7 +180,7 @@ implements Comparable<Identifier>
 
 			if (ObjectUtils.areComparable(cThis, cThat))
 			{
-				result = ((Comparable) cThis).compareTo(((Comparable) cThat));
+				result = ((Comparable) cThis).compareTo((cThat));
 			}
 			else
 			{
@@ -198,8 +202,8 @@ implements Comparable<Identifier>
 	public String toString()
 	{
 		if (components.isEmpty()) return "";
-
-		return (components.size() == 1 ? firstComponent().toString() : "(" + StringUtils.join(SEPARATOR, components) + ")");
+		
+		return (components.size() == 1 ? Format.id(this, SEPARATOR) : "(" + Format.id(this) + ")");
 	}
 
 	/**

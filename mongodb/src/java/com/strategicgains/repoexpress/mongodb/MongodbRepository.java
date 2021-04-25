@@ -38,6 +38,7 @@ import com.strategicgains.repoexpress.exception.ItemNotFoundException;
 
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
+import dev.morphia.converters.UUIDConverter;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.Query;
 import dev.morphia.query.Sort;
@@ -77,6 +78,7 @@ implements Queryable<T>
 	private void initialize(String name, Class<? extends T>... entityClasses)
 	{
 		morphia = new Morphia();
+		morphia.getMapper().getConverters().addConverter(new UUIDConverter());
 		inheritanceRoot = (Class<T>) entityClasses[0];
 
 		for (Class<?> entityClass : entityClasses)

@@ -6,6 +6,10 @@
 	<artifactId>repoexpress-cassandra</artifactId>
 	<packaging>jar</packaging>
 
+	<properties>
+		<driver.version>4.13.0</driver.version>
+	</properties>
+
 	<parent>
 		<groupId>com.strategicgains.repoexpress</groupId>
 		<artifactId>repoexpress-parent</artifactId>
@@ -27,9 +31,9 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.datastax.cassandra</groupId>
-			<artifactId>cassandra-driver-core</artifactId>
-			<version>3.10.2</version>
+			<groupId>com.datastax.oss</groupId>
+			<artifactId>java-driver-core</artifactId>
+			<version>${driver.version}</version>
 		</dependency>
 	</dependencies>
 </project>

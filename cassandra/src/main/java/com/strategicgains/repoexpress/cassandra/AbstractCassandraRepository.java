@@ -15,8 +15,9 @@
  */
 package com.strategicgains.repoexpress.cassandra;
 
-import com.datastax.driver.core.BoundStatement;
-import com.datastax.driver.core.Session;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.BoundStatement;
+import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.strategicgains.repoexpress.AbstractObservableRepository;
 import com.strategicgains.repoexpress.domain.Identifiable;
 import com.strategicgains.repoexpress.domain.Identifier;
@@ -40,21 +41,21 @@ import com.strategicgains.repoexpress.exception.ItemNotFoundException;
 public abstract class AbstractCassandraRepository<T extends Identifiable>
 extends AbstractObservableRepository<T>
 {
-	private Session session;
+	private CqlSession session;
 	private String table;
 
 	/**
 	 * @param session a pre-configured Session instance.
 	 * @param tableName the name of the Cassandra table entities are stored in.
 	 */
-    public AbstractCassandraRepository(Session session, String tableName)
+    public AbstractCassandraRepository(CqlSession session, String tableName)
 	{
 		super();
 		this.session = session;
 		this.table = tableName;
 	}
     
-    protected Session getSession()
+    protected CqlSession getSession()
     {
     	return session;
     }
@@ -114,9 +115,9 @@ extends AbstractObservableRepository<T>
 		}
 	}
 
-	protected void bindIdentifier(BoundStatement bs, Identifier identifier)
+	protected BoundStatement bindIdentifier(PreparedStatement ps, Identifier identifier)
 	{
-		bs.bind(identifier.components().toArray());
+		return ps.bind(identifier.components().toArray());
 	}
 
 	/**

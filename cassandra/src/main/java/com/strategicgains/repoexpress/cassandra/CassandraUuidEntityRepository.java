@@ -1,6 +1,6 @@
 package com.strategicgains.repoexpress.cassandra;
 
-import com.datastax.driver.core.Session;
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.strategicgains.repoexpress.domain.UuidEntity;
 import com.strategicgains.repoexpress.event.UuidEntityRepositoryObserver;
 
@@ -20,7 +20,7 @@ import com.strategicgains.repoexpress.event.UuidEntityRepositoryObserver;
 public abstract class CassandraUuidEntityRepository<T extends UuidEntity>
 extends CassandraEntityRepository<T>
 {
-	public CassandraUuidEntityRepository(Session session, String tableName, String identifierColumn)
+	public CassandraUuidEntityRepository(CqlSession session, String tableName, String identifierColumn)
     {
 	    super(session, tableName, identifierColumn);
 	    initializeObservers();

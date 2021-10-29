@@ -15,10 +15,10 @@
 */
 package com.strategicgains.repoexpress.cassandra;
 
-import com.datastax.driver.core.BoundStatement;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.BoundStatement;
+import com.datastax.oss.driver.api.core.cql.PreparedStatement;
+import com.datastax.oss.driver.api.core.cql.Row;
 import com.strategicgains.repoexpress.domain.Identifiable;
 import com.strategicgains.repoexpress.domain.Identifier;
 
@@ -50,7 +50,7 @@ extends AbstractCassandraRepository<T>
 	 * @param databaseName the name of a database this repository works against.
 	 * @param identifierColumn the column name that holds the row key or unique identifier.
 	 */
-    public CassandraEntityRepository(Session session, String tableName, String identifierColumn)
+    public CassandraEntityRepository(CqlSession session, String tableName, String identifierColumn)
 	{
 		super(session, tableName);
 		this.identifierColumn = identifierColumn;
@@ -74,8 +74,7 @@ extends AbstractCassandraRepository<T>
 	{
 		if (identifier == null || identifier.isEmpty()) return false;
 
-		BoundStatement bs = new BoundStatement(existStmt);
-		bs.bind(identifier.firstComponent());
+		BoundStatement bs = bindIdentifier(existStmt, identifier);
 		return (getSession().execute(bs).one().getLong(0) > 0);
 	}
 
@@ -84,8 +83,7 @@ extends AbstractCassandraRepository<T>
 	{
 		if (identifier == null || identifier.isEmpty()) return null;
 		
-		BoundStatement bs = new BoundStatement(readStmt);
-		bs.bind(identifier.firstComponent());
+		BoundStatement bs = bindIdentifier(readStmt, identifier);
 		return marshalRow(getSession().execute(bs).one());
 	}
 
@@ -94,8 +92,7 @@ extends AbstractCassandraRepository<T>
 	{
 		if (entity == null) return;
 		
-		BoundStatement bs = new BoundStatement(deleteStmt);
-		bindIdentifier(bs, entity.getIdentifier());
+		BoundStatement bs = bindIdentifier(deleteStmt, entity.getIdentifier());
 		getSession().execute(bs);
 	}
 

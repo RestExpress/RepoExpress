@@ -15,15 +15,20 @@
  */
 package com.strategicgains.repoexpress.cassandra;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.restexpress.common.exception.ConfigurationException;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Cluster.Builder;
-import com.datastax.driver.core.ConsistencyLevel;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
+import com.datastax.oss.driver.api.core.ConsistencyLevel;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.CqlSessionBuilder;
+import com.datastax.oss.driver.api.core.DefaultConsistencyLevel;
 
 /**
  * @author toddf
@@ -39,21 +44,21 @@ public class CassandraConfig
 	private static final String READ_CONSISTENCY_LEVEL = "cassandra.readConsistencyLevel";
 	private static final String WRITE_CONSISTENCY_LEVEL = "cassandra.writeConsistencyLevel";
 
-	private String[] contactPoints;
+	private Collection<InetSocketAddress> contactPoints;
 	private String keyspace;
 	private int port;
 	private String dataCenter;
 	private ConsistencyLevel readConsistencyLevel;
 	private ConsistencyLevel writeConsistencyLevel;
 
-	private Session session;
+	private CqlSession session;
 
 	public CassandraConfig(Properties p)
 	{
 		port = Integer.parseInt(p.getProperty(PORT_PROPERTY, DEFAULT_PORT));
 		dataCenter = p.getProperty(DATA_CENTER);
-		readConsistencyLevel = ConsistencyLevel.valueOf(p.getProperty(READ_CONSISTENCY_LEVEL, "LOCAL_QUORUM"));
-		writeConsistencyLevel = ConsistencyLevel.valueOf(p.getProperty(WRITE_CONSISTENCY_LEVEL, "LOCAL_QUORUM"));
+		readConsistencyLevel = DefaultConsistencyLevel.valueOf(p.getProperty(READ_CONSISTENCY_LEVEL, "LOCAL_QUORUM"));
+		writeConsistencyLevel = DefaultConsistencyLevel.valueOf(p.getProperty(WRITE_CONSISTENCY_LEVEL, "LOCAL_QUORUM"));
 		keyspace = p.getProperty(KEYSPACE_PROPERTY);
 
 		if (keyspace == null || keyspace.trim().isEmpty())
@@ -68,11 +73,20 @@ public class CassandraConfig
 		if (contactPointsCommaDelimited == null || contactPointsCommaDelimited.trim().isEmpty())
 		{
 			throw new ConfigurationException(
-			    "Please define Cassandra contact points for property: "
+			    "Please define Cassandra contact points (IP addresses) for property: "
 			        + CONTACT_POINTS_PROPERTY);
 		}
 
-		contactPoints = contactPointsCommaDelimited.split(",\\s*");
+		contactPoints = Arrays.stream(contactPointsCommaDelimited.split(",\\s*")).map(s -> {
+			try
+			{
+				return new InetSocketAddress(InetAddress.getByName(s), port);
+			}
+			catch (UnknownHostException e)
+			{
+				throw new ConfigurationException(e);
+			}
+		}).collect(Collectors.toList());
 
 		initialize(p);
 	}
@@ -112,25 +126,26 @@ public class CassandraConfig
 		return writeConsistencyLevel;
 	}
 
-	public Session getSession()
+	public CqlSession getSession()
 	{
 		if (session == null)
 		{
-			session = getCluster().connect(getKeyspace());
+			session = createSession();
 		}
 
 		return session;
 	}
 
-	protected Cluster getCluster()
+	protected CqlSession createSession()
 	{
-		Builder cb = Cluster.builder();
+		CqlSessionBuilder cb = CqlSession.builder();
 		cb.addContactPoints(contactPoints);
-		cb.withPort(getPort());
+		cb.withKeyspace(getKeyspace());
 		
 		if (getDataCenter() != null)
 		{
-			cb.withLoadBalancingPolicy(DCAwareRoundRobinPolicy.builder().withLocalDc(getDataCenter()).build());
+			cb.withLocalDatacenter(getDataCenter());
+//			cb.withLoadBalancingPolicy(DCAwareRoundRobinPolicy.builder().withLocalDc(getDataCenter()).build());
 		}
 		
 		enrichCluster(cb);
@@ -142,7 +157,7 @@ public class CassandraConfig
 	 * 
 	 * @param clusterBuilder
 	 */
-	protected void enrichCluster(Builder clusterBuilder)
+	protected void enrichCluster(CqlSessionBuilder clusterBuilder)
     {
 		// default is to do nothing.
     }

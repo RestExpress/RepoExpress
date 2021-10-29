@@ -15,7 +15,7 @@
  */
 package com.strategicgains.repoexpress.cassandra;
 
-import com.datastax.driver.core.Session;
+import com.datastax.oss.driver.api.core.CqlSession;
 import com.strategicgains.repoexpress.domain.TimestampedIdentifiable;
 import com.strategicgains.repoexpress.event.DefaultTimestampedIdentifiableRepositoryObserver;
 
@@ -35,7 +35,7 @@ import com.strategicgains.repoexpress.event.DefaultTimestampedIdentifiableReposi
 public abstract class CassandraTimestampedEntityRepository<T extends TimestampedIdentifiable>
 extends CassandraEntityRepository<T>
 {
-	public CassandraTimestampedEntityRepository(Session session, String tableName, String identifierColumn)
+	protected CassandraTimestampedEntityRepository(CqlSession session, String tableName, String identifierColumn)
 	{
 		super(session, tableName, identifierColumn);
 		initializeObservers();

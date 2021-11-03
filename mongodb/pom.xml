@@ -28,8 +28,8 @@
 		</dependency>
 		<dependency>
 	        <groupId>dev.morphia.morphia</groupId>
-	        <artifactId>core</artifactId>
-	        <version>1.6.1</version>
+	        <artifactId>morphia-core</artifactId>
+	        <version>2.2.2</version>
 	    </dependency>
    	</dependencies>
 

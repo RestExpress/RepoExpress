@@ -4,10 +4,11 @@ import java.util.Properties;
 
 import org.restexpress.common.exception.ConfigurationException;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientOptions.Builder;
-import com.mongodb.MongoClientURI;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoClientSettings.Builder;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 
 public class MongoConfig
 {
@@ -35,9 +36,16 @@ public class MongoConfig
 			throw new ConfigurationException(String.format("Please define a MongoDB URI for property: %s or %s", URI_PROPERTY, URI_ENVIRONMENT_PROPERTY));
 		}
 
-		MongoClientURI mongoUri = new MongoClientURI(uri, (builder != null) ? builder : new MongoClientOptions.Builder());
-		dbName = mongoUri.getDatabase();
-        client = new MongoClient(mongoUri);
+//		MongoClientURI mongoUri = new MongoClientURI(uri, (builder != null) ? builder : new MongoClientOptions.Builder());
+//		dbName = mongoUri.getDatabase();
+//        client = new MongoClient(mongoUri);
+
+		ConnectionString connectionString = new ConnectionString(uri);
+		dbName = connectionString.getDatabase();
+
+		Builder settings = (builder != null ? builder : MongoClientSettings.builder());
+		settings.applyConnectionString(connectionString);
+		client = MongoClients.create(settings.build());
 		initialize(p);
     }
 

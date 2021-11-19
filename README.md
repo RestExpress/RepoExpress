@@ -102,7 +102,7 @@ Release 1.0.0-SNAPSHOT
 * InMemoryRepository no longer assigns IDs and, instead, expects the ID to be set on the incoming object. Throws exception if not.
 * Upgraded to Morphia 1.6.1
 * Upgraded to Jedis 3.5.1
-* Upgraded to DataStax driver 3.10.2
+* Upgraded to DataStax driver 4.13.0
 
 Release 0.4.8 - 10 Feb 2016
 ---------------------------

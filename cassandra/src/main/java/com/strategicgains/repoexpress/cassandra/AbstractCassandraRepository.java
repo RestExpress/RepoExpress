@@ -48,7 +48,7 @@ extends AbstractObservableRepository<T>
 	 * @param session a pre-configured Session instance.
 	 * @param tableName the name of the Cassandra table entities are stored in.
 	 */
-    public AbstractCassandraRepository(CqlSession session, String tableName)
+    protected AbstractCassandraRepository(CqlSession session, String tableName)
 	{
 		super();
 		this.session = session;

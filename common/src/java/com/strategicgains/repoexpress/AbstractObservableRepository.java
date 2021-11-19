@@ -36,12 +36,12 @@ implements ObservableRepository<T>
 {
 	// SECTION: INSTANCE VARIABLES
 	
-	private List<RepositoryObserver<T>> observers = new ArrayList<RepositoryObserver<T>>();
+	private List<RepositoryObserver<T>> observers = new ArrayList<>();
 
 	
 	// SECTION: CONSTRUCTORS
 	
-	public AbstractObservableRepository()
+	protected AbstractObservableRepository()
 	{
 		super();
 	}

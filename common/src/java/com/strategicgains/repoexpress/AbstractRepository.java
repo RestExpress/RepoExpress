@@ -60,7 +60,7 @@ implements Repository<T>
 	@Override
 	public List<T> readList(Collection<Identifier> ids)
     {
-    	List<T> results = new ArrayList<T>(ids.size());
+    	List<T> results = new ArrayList<>(ids.size());
     	
     	for (Identifier id : ids)
     	{

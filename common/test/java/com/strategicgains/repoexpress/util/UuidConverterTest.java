@@ -111,6 +111,6 @@ public class UuidConverterTest
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldThrowOnShortUuidWithNonUrlSafeCharacters()
 	{
-		UuidConverter.parse("aStringThatIs22CharsL*");
+		UuidConverter.parse("#StringThatIs22CharsL*");
 	}
 }

@@ -190,7 +190,8 @@ public abstract class UuidConverter
 		while (i < 15)
 		{
 			// Get the next four characters.
-			int d = I256[s.charAt(j++)] << 18 | I256[s.charAt(j++)] << 12 | I256[s.charAt(j++)] << 6 | I256[s.charAt(j++)];
+			int d = nextChar(s, j++) << 18 | nextChar(s, j++) << 12 | nextChar(s, j++) << 6 | nextChar(s, j++);
+//			int d = I256[s.charAt(j++)] << 18 | I256[s.charAt(j++)] << 12 | I256[s.charAt(j++)] << 6 | I256[s.charAt(j++)];
 
 			// Put them in these three bytes.
 			bytes[i++] = (byte) (d >> 16);
@@ -201,5 +202,13 @@ public abstract class UuidConverter
 		// Add the last two characters from the string into the last byte.
 		bytes[i] = (byte) ((I256[s.charAt(j++)] << 18 | I256[s.charAt(j++)] << 12) >> 16);
 		return bytes;
+	}
+
+	private static int nextChar(String s, int j)
+	{
+		char c = s.charAt(j);
+		int v = I256[c];
+		if (v == 0 && c != 'A') throw new IllegalArgumentException("Invalid character in short UUID: " + c);
+		return v;
 	}
 }

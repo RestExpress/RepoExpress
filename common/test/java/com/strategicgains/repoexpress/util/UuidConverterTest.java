@@ -35,7 +35,7 @@ public class UuidConverterTest
 	}
 
 	@Test
-	public void shouldHandleThisUuid1()
+	public void shouldHandleThisUuid()
 	{
 		String base64 = "b8tRS7h4TJ2Vt43Dp85v2A";
 		String name = "6fcb514b-b878-4c9d-95b7-8dc3a7ce6fd8";
@@ -52,6 +52,23 @@ public class UuidConverterTest
 	}
 
 	@Test
+	public void shouldHandleZeroUuid()
+	{
+		String zeros = "00000000-0000-0000-0000-000000000000";
+		String shortId = "0000000000000000000000";
+		UUID expect = UUID.fromString(zeros);
+
+		String shortened = UuidConverter.format(expect);
+		assertEquals(shortId, shortened);
+
+		UUID expanded = UuidConverter.parse(zeros);
+		assertEquals(expect, expanded);
+
+		expanded = UuidConverter.parse(shortId);
+		assertEquals(expect, expanded);
+	}
+
+	@Test
 	public void shouldHandlePaddedShortForm()
 	{
 		String base64 = "b8tRS7h4TJ2Vt43Dp85v2A==";
@@ -59,5 +76,41 @@ public class UuidConverterTest
 		
 		UUID expanded = UuidConverter.parse(base64);
 		assertEquals(expect, expanded);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void shouldThrowOnInvalidUuid()
+	{
+		UuidConverter.parse("aStringThatIs25CharsLong ");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void shouldThrowOnInvalid24ShortUuid()
+	{
+		UuidConverter.parse("aStringThatIs24CharsLong");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void shouldThrowOnInvalid23ShortUuid()
+	{
+		UuidConverter.parse("aStringThatIs23CharsLon");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void shouldThrowOnInvalidSlashShortUuid()
+	{
+		UuidConverter.parse("//////////////////////");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void shouldThrowOnInvalid22ShortUuid()
+	{
+		UuidConverter.parse("aStringThatIs22CharsLo");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void shouldThrowOnShortUuidWithNonUrlSafeCharacters()
+	{
+		UuidConverter.parse("aStringThatIs22CharsL*");
 	}
 }

@@ -23,6 +23,11 @@ import java.util.UUID;
  * representation of it (and back). Implements a very efficient URL-safe Base64
  * encoding/decoding algorithm to format/parse the UUID.
  * 
+ * NOTE: There is NO WAY for this algorithm to detect an invalid short-form 
+ *       UUID if it is 22 characters in length and composed of alpha-numeric
+ *       characters! So be careful to not use the parse() method to check
+ *       the short-form UUID string for validity.
+ * 
  * @author toddf
  * @since Mar 13, 2013
  */
@@ -39,6 +44,8 @@ public abstract class UuidConverter
 			I256[C64[i]] = i;
 		}
 	}
+	private static final UUID ZERO_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+	private static final String ZERO_SHORT_ID = "0000000000000000000000";
 
 	/**
 	 * Given a UUID instance, return a short (22-character) string
@@ -53,13 +60,15 @@ public abstract class UuidConverter
 	{
 		if (uuid == null) throw new NullPointerException("Null UUID");
 
+		if (ZERO_UUID.equals(uuid)) return ZERO_SHORT_ID;
+
 		byte[] bytes = toByteArray(uuid);
 		return encodeBase64(bytes);
 	}
 
 	/**
-	 * Given a UUID representation (either a short or long form), return a
-	 * UUID from it.
+	 * Given a UUID representation (either a short or long form) string, return a
+	 * UUID instance from it.
 	 * <p/>
 	 * If the uuidString is longer than our short, 22-character form (or 24 with padding),
 	 * it is assumed to be a full-length 36-character UUID string.
@@ -83,11 +92,22 @@ public abstract class UuidConverter
 			throw new IllegalArgumentException("Short UUID must be 22 characters: " + uuidString);
 		}
 
+		if (uuidString.length() > 22 && !"==".equals(uuidString.substring(22)))
+		{
+			throw new IllegalArgumentException("Invalid short UUID: " + uuidString);
+		}
+
+		if (ZERO_SHORT_ID.equals(uuidString)) return ZERO_UUID;
+
 		byte[] bytes = decodeBase64(uuidString);
 		ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
 		bb.put(bytes, 0, 16);
 		bb.clear();
-		return new UUID(bb.getLong(), bb.getLong());
+		UUID result = new UUID(bb.getLong(), bb.getLong());
+
+		if (ZERO_UUID.equals(result)) throw new IllegalArgumentException("Invalid short UUID: " + uuidString);
+
+		return result;
 	}
 
 	/**

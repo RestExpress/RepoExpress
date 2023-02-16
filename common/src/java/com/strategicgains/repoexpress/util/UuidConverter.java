@@ -33,10 +33,16 @@ import java.util.UUID;
  */
 public abstract class UuidConverter
 {
+	private UuidConverter()
+	{
+		// prevents instantiation.
+	}
+
 	// Varies from standard Base64 by the last two characters in this string ("-" and "_").
 	// The standard characters are "+" and "/" respectively, but are not URL safe.
 	private static final char[] C64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".toCharArray();
 	private static final int[] I256 = new int[256];
+
 	static
 	{
 		for (int i = 0; i < C64.length; i++)
@@ -162,7 +168,7 @@ public abstract class UuidConverter
 		// The last byte of the input gets put into two characters at the end of the string.
 		int d = (bytes[i] & 0xff) << 10;
 		chars[j++] = C64[d >> 12];
-		chars[j++] = C64[(d >>> 6) & 0x3f];
+		chars[j] = C64[(d >>> 6) & 0x3f];
 		return new String(chars);
 	}
 
@@ -190,8 +196,7 @@ public abstract class UuidConverter
 		while (i < 15)
 		{
 			// Get the next four characters.
-			int d = nextChar(s, j++) << 18 | nextChar(s, j++) << 12 | nextChar(s, j++) << 6 | nextChar(s, j++);
-//			int d = I256[s.charAt(j++)] << 18 | I256[s.charAt(j++)] << 12 | I256[s.charAt(j++)] << 6 | I256[s.charAt(j++)];
+			int d = getChar(s, j++) << 18 | getChar(s, j++) << 12 | getChar(s, j++) << 6 | getChar(s, j++);
 
 			// Put them in these three bytes.
 			bytes[i++] = (byte) (d >> 16);
@@ -200,11 +205,11 @@ public abstract class UuidConverter
 		}
 
 		// Add the last two characters from the string into the last byte.
-		bytes[i] = (byte) ((I256[s.charAt(j++)] << 18 | I256[s.charAt(j++)] << 12) >> 16);
+		bytes[i] = (byte) ((I256[s.charAt(j++)] << 18 | I256[s.charAt(j)] << 12) >> 16);
 		return bytes;
 	}
 
-	private static int nextChar(String s, int j)
+	private static int getChar(String s, int j)
 	{
 		char c = s.charAt(j);
 		int v = I256[c];

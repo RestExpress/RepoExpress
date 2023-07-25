@@ -35,7 +35,5 @@
 
 	<build>
 		<defaultGoal>compile</defaultGoal>
-		<sourceDirectory>src/java</sourceDirectory>
-		<testSourceDirectory>test/java</testSourceDirectory>
 	</build>
 </project>

@@ -15,19 +15,22 @@
 */
 package com.strategicgains.repoexpress.mongodb;
 
+import static com.mongodb.client.model.Filters.eq;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
-import org.restexpress.common.query.FilterCallback;
-import org.restexpress.common.query.FilterComponent;
-import org.restexpress.common.query.OrderCallback;
-import org.restexpress.common.query.OrderComponent;
 import org.restexpress.common.query.QueryFilter;
 import org.restexpress.common.query.QueryOrder;
 import org.restexpress.common.query.QueryRange;
 
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.FindOneAndReplaceOptions;
+import com.mongodb.client.model.ReturnDocument;
 import com.strategicgains.repoexpress.AbstractObservableRepository;
 import com.strategicgains.repoexpress.Queryable;
 import com.strategicgains.repoexpress.domain.Identifiable;
@@ -37,11 +40,6 @@ import com.strategicgains.repoexpress.exception.InvalidObjectIdException;
 import com.strategicgains.repoexpress.exception.ItemNotFoundException;
 
 import dev.morphia.Datastore;
-import dev.morphia.Morphia;
-import dev.morphia.converters.UUIDConverter;
-import dev.morphia.query.FindOptions;
-import dev.morphia.query.Query;
-import dev.morphia.query.Sort;
 
 /**
  * Uses MongoDB as its back-end store to persist Identifiable implementations.
@@ -55,9 +53,10 @@ public class MongodbRepository<T extends Identifiable>
 extends AbstractObservableRepository<T>
 implements Queryable<T>
 {
+	private static final String ID_PROPERTY = "_id";
+
 	private MongoClient mongo;
-	private Morphia morphia;
-	private Datastore datastore;
+	MongoCollection<T> collection;
 	private Class<T> inheritanceRoot;
 
 	/**
@@ -77,18 +76,12 @@ implements Queryable<T>
 	@SuppressWarnings("unchecked")
 	private void initialize(String name, Class<? extends T>... entityClasses)
 	{
-		morphia = new Morphia();
-		morphia.getMapper().getConverters().addConverter(new UUIDConverter());
+		MongoDatabase db = mongo.getDatabase(name);
 		inheritanceRoot = (Class<T>) entityClasses[0];
+		this.collection = db.getCollection(inheritanceRoot.getSimpleName(), inheritanceRoot);
 
-		for (Class<?> entityClass : entityClasses)
-		{
-			morphia.map(entityClass);
-		}
-
-		datastore = morphia.createDatastore(mongo, name);
-		datastore.ensureIndexes();
-		datastore.ensureCaps();
+		//TODO: create indexes
+//		collection.createIndexes(null);
 	}
 
 	@Override
@@ -100,14 +93,14 @@ implements Queryable<T>
 			    + " ID already exists: " + item.getIdentifier());
 		}
 
-		datastore.save(item);
+		collection.insertOne(item);
 		return item;
 	}
 
 	@Override
 	public T doRead(Identifier id)
 	{
-		T item = datastore.find(inheritanceRoot).field("_id").equal(id.lastComponent()).first();
+		T item = collection.find(eq(ID_PROPERTY, id.lastComponent())).first();
 
 		if (item == null)
 		{
@@ -120,13 +113,17 @@ implements Queryable<T>
 	@Override
 	public T doUpdate(T item, boolean ifExists)
 	{
+		Document filterById = new Document("_id", item.getIdentifier());
+        FindOneAndReplaceOptions returnDocAfterReplace = new FindOneAndReplaceOptions().returnDocument(ReturnDocument.AFTER);
+        T updated = collection.findOneAndReplace(filterById, item, returnDocAfterReplace);
+
 		if (ifExists && !exists(item.getIdentifier()))
 		{
 			throw new ItemNotFoundException(item.getClass().getSimpleName()
 			    + " ID not found: " + item.getIdentifier());
 		}
 
-		datastore.save(item);
+		collection..save(item);
 		return item;
 	}
 
@@ -188,7 +185,7 @@ implements Queryable<T>
 	@Override
 	public List<T> readList(Collection<Identifier> ids)
 	{
-		return getDataStore().createQuery(inheritanceRoot).field("_id").in(new PrimaryIdIterable(ids)).find().toList();
+		return getDataStore().find(inheritanceRoot).filter(Filters.in(ID_PROPERTY, new PrimaryIdIterable(ids))).iterator().toList();
 	}
 
 	/**
@@ -210,7 +207,7 @@ implements Queryable<T>
 	 */
 	public long count(Class<T> type, QueryFilter filter)
 	{
-		return getBaseFilterQuery(type, filter).count();
+		return getBaseQuery(type, filter).count();
 	}
 
 	/**
@@ -223,7 +220,7 @@ implements Queryable<T>
 	{
 		if (id == null) return false;
 
-		return (datastore.find(inheritanceRoot).field("_id").equal(id.lastComponent()).count() > 0);
+		return (datastore.find(inheritanceRoot).filter(Filters.eq(ID_PROPERTY, id.lastComponent())).count() > 0);
 	}
 
 
@@ -260,45 +257,9 @@ implements Queryable<T>
 	 */
 	protected List<T> query(Class<T> type, QueryFilter filter, QueryRange range, QueryOrder order)
 	{
-		Query<T> q = getBaseQuery(type, filter, order);
-		FindOptions fo = createFindOptions(range);
-		return (fo != null ? q.find(fo).toList() : q.find().toList());
-	}
-
-	/**
-	 * Creates a base query with ordering configured, if present. To support limit and offset (range)
-	 * in the query, call createFindOptions(QueryRange) and pass it in to the asList(FindOptions) call
-	 * if not null.
-	 * 
-	 * @param type
-	 * @param filter
-	 * @param order
-	 * @return a new Query instance
-	 * @see createFindOptions(QueryRange)
-	 */
-	protected Query<T> getBaseQuery(Class<T> type, QueryFilter filter, QueryOrder order)
-	{
-		Query<T> q = getBaseFilterQuery(type, filter);
-		configureQueryOrder(q, order);
-		return q;
-	}
-
-	/**
-	 * @param range a QueryRange instance.
-	 * @return a configured FindOptions if the range is initialized. Or null, if not.
-	 */
-	protected FindOptions createFindOptions(QueryRange range)
-	{
-		if (range == null) return null;
-
-		if (range.isInitialized())
-		{
-			return new FindOptions()
-				.skip((int) range.getStart())
-				.limit(range.getLimit());
-		}
-
-		return null;
+		Query<T> q = getBaseQuery(type, filter);
+		FindOptions fo = createFindOptions(range, order);
+		return (fo != null ? q.iterator(fo).toList() : q.iterator().toList());
 	}
 
 	/**
@@ -308,95 +269,98 @@ implements Queryable<T>
 	 * @param filter
 	 * @return a Morphia Query instance configured for the QueryFilter criteria.
 	 */
-	private Query<T> getBaseFilterQuery(Class<T> type, QueryFilter filter)
+	private Query<T> getBaseQuery(Class<T> type, QueryFilter filter)
 	{
 		Query<T> q = getDataStore().find(type);
 		configureQueryFilter(q, filter);
 		return q;
 	}
 
-	private void configureQueryFilter(final Query<T> q, QueryFilter filter)
+	/**
+	 * @param range a QueryRange instance.
+	 * @return a configured FindOptions if the range is initialized. Or null, if not.
+	 */
+	protected FindOptions createFindOptions(QueryRange range, QueryOrder order)
 	{
-		if (filter == null) return;
+		if (range == null && order == null) return null;
 
-		filter.iterate(new FilterCallback()
-		{
-			@Override
-			public void filterOn(FilterComponent c)
-			{
-				switch(c.getOperator())
-				{
-					case CONTAINS:		// String-related
-						q.field(c.getField()).contains((c.getValue().toString()));
-						break;
-					case STARTS_WITH:	// String-related
-						q.field(c.getField()).startsWith(c.getValue().toString());
-						break;
-					case GREATER_THAN:
-						q.field(c.getField()).greaterThan(c.getValue());
-						break;
-					case GREATER_THAN_OR_EQUAL_TO:
-						q.field(c.getField()).greaterThanOrEq(c.getValue());
-						break;
-					case LESS_THAN:
-						q.field(c.getField()).lessThan(c.getValue());
-						break;
-					case LESS_THAN_OR_EQUAL_TO:
-						q.field(c.getField()).lessThanOrEq(c.getValue());
-						break;
-					case NOT_EQUALS:
-						q.field(c.getField()).notEqual(c.getValue());
-						break;
-					case IN:
-						q.field(c.getField()).in((Iterable<?>) c.getValue());
-						break;
-					case EQUALS:
-					default:
-						q.field(c.getField()).equal(c.getValue());
-						break;
-				}
-			}
-		});
+		FindOptions fo = new FindOptions();
+		configureRange(fo, range);
+		configureOrdering(fo, order);
+		return fo;
 	}
 
-	/**
-	 * @param q
-	 * @param order
-	 */
-	private void configureQueryOrder(Query<T> q, QueryOrder order)
+	private void configureRange(FindOptions findOptions, QueryRange range)
+	{
+		if (range == null) return;
+
+		if (range.isInitialized())
+		{
+			findOptions
+				.skip((int) range.getStart())
+				.limit(range.getLimit());
+		}
+	}
+
+	private void configureOrdering(FindOptions findOptions, QueryOrder order)
 	{
 		if (order == null) return;
 
 		if (order.isSorted())
 		{
 			final ArrayList<Sort> sorts = new ArrayList<>();
-			
-			order.iterate(new OrderCallback()
-			{
-				@Override
-				public void orderBy(OrderComponent component)
+
+			order.iterate(component -> {
+				if (component.isDescending())
 				{
-					if (component.isDescending())
-					{
-						sorts.add(Sort.descending(component.getFieldName()));
-					}
-					else
-					{
-						sorts.add(Sort.ascending(component.getFieldName()));
-					}
+					sorts.add(Sort.descending(component.getFieldName()));
 				}
+				else
+				{
+					sorts.add(Sort.ascending(component.getFieldName()));
+				}				
 			});
 			
-			q.order(sorts.toArray(new Sort[0]));
+			findOptions.sort(sorts.toArray(new Sort[0]));
 		}
 	}
-	
-	/**
-	 * Get the underlying Morphia instance.
-	 * 
-	 * @return morphia
-	 */
-	public Morphia getMorphia() {
-		return morphia;
+
+	private void configureQueryFilter(final Query<T> q, QueryFilter filter)
+	{
+		if (filter == null) return;
+
+		filter.iterate(c -> {
+			switch(c.getOperator())
+			{
+				case CONTAINS:		// String-related
+					q.filter(Filters.regex(c.getField(), Pattern.compile((String) c.getValue())));
+					break;
+				case STARTS_WITH:	// String-related
+					q.filter(Filters.regex(c.getField(), Pattern.compile("^" + (String) c.getValue())));
+					break;
+				case GREATER_THAN:
+					q.filter(Filters.gt(c.getField(), c.getValue()));
+					break;
+				case GREATER_THAN_OR_EQUAL_TO:
+					q.filter(Filters.gte(c.getField(), c.getValue()));
+					break;
+				case LESS_THAN:
+					q.filter(Filters.lt(c.getField(), c.getValue()));
+					break;
+				case LESS_THAN_OR_EQUAL_TO:
+					q.filter(Filters.lte(c.getField(), c.getValue()));
+					break;
+				case NOT_EQUALS:
+					q.filter(Filters.ne(c.getField(), c.getValue()));
+					break;
+				case IN:
+					q.filter(Filters.in(c.getField(), (Iterable<?>) c.getValue()));
+					break;
+				case EQUALS:
+				default:
+					q.filter(Filters.eq(c.getField(), c.getValue()));
+					break;
+			}
+		});
 	}
 }

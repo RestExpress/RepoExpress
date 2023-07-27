@@ -38,7 +38,7 @@ import org.restexpress.common.query.QueryFilter;
  * @author tfredrich
  * @since Jul 16, 2015
  */
-@Ignore
+//@Ignore
 public class DateFilteringTest
 {
 	private static final int CREATE_COUNT = 5;

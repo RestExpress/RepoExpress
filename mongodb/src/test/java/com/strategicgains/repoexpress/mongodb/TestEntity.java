@@ -15,10 +15,13 @@
 */
 package com.strategicgains.repoexpress.mongodb;
 
+import dev.morphia.annotations.Entity;
+
 /**
  * @author tfredrich
  * @since Jul 16, 2015
  */
+@Entity
 public class TestEntity
 extends AbstractUuidMongodbEntity
 {

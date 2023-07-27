@@ -4,10 +4,11 @@ import java.util.Properties;
 
 import org.restexpress.common.exception.ConfigurationException;
 
-import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientOptions.Builder;
 import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 
 public class MongoConfig
 {
@@ -37,7 +38,7 @@ public class MongoConfig
 
 		MongoClientURI mongoUri = new MongoClientURI(uri, (builder != null) ? builder : new MongoClientOptions.Builder());
 		dbName = mongoUri.getDatabase();
-        client = new MongoClient(mongoUri);
+        client = MongoClients.create(mongoUri.getURI());
 		initialize(p);
     }
 

@@ -21,7 +21,7 @@ import org.restexpress.common.query.QueryFilter;
 import org.restexpress.common.query.QueryOrder;
 import org.restexpress.common.query.QueryRange;
 
-import com.strategicgains.repoexpress.domain.Identifiable;
+import com.strategicgains.noschema.Identifiable;
 
 /**
  * Defines the interface for a repository implementation that supports dynamic query

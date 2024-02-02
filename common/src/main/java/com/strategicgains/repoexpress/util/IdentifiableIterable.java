@@ -17,8 +17,8 @@ package com.strategicgains.repoexpress.util;
 
 import java.util.Iterator;
 
-import com.strategicgains.repoexpress.domain.Identifiable;
-import com.strategicgains.repoexpress.domain.Identifier;
+import com.strategicgains.noschema.Identifiable;
+import com.strategicgains.noschema.Identifier;
 
 
 /**

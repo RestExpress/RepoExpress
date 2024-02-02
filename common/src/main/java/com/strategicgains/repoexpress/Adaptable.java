@@ -15,7 +15,7 @@
 */
 package com.strategicgains.repoexpress;
 
-import com.strategicgains.repoexpress.domain.Identifier;
+import com.strategicgains.noschema.Identifier;
 
 /**
  * Defines the interface to adapt an identifer to another instance type.

@@ -19,8 +19,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.UUID;
 
+import com.strategicgains.noschema.Identifier;
 import com.strategicgains.repoexpress.adapter.Identifiers;
-import com.strategicgains.repoexpress.domain.Identifier;
 
 /**
  * @author toddf

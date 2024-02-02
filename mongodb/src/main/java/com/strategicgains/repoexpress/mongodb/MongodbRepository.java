@@ -28,10 +28,10 @@ import org.restexpress.common.query.QueryOrder;
 import org.restexpress.common.query.QueryRange;
 
 import com.mongodb.MongoClient;
+import com.strategicgains.noschema.Identifiable;
+import com.strategicgains.noschema.Identifier;
 import com.strategicgains.repoexpress.AbstractObservableRepository;
 import com.strategicgains.repoexpress.Queryable;
-import com.strategicgains.repoexpress.domain.Identifiable;
-import com.strategicgains.repoexpress.domain.Identifier;
 import com.strategicgains.repoexpress.exception.DuplicateItemException;
 import com.strategicgains.repoexpress.exception.InvalidObjectIdException;
 import com.strategicgains.repoexpress.exception.ItemNotFoundException;

@@ -20,8 +20,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.strategicgains.repoexpress.domain.Identifiable;
-import com.strategicgains.repoexpress.domain.Identifier;
+import com.strategicgains.noschema.Identifiable;
+import com.strategicgains.noschema.Identifier;
 import com.strategicgains.repoexpress.event.RepositoryObserver;
 
 /**

@@ -19,8 +19,8 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.Row;
-import com.strategicgains.repoexpress.domain.Identifiable;
-import com.strategicgains.repoexpress.domain.Identifier;
+import com.strategicgains.noschema.Identifiable;
+import com.strategicgains.noschema.Identifier;
 
 /**
  * A Cassandra repository that manages types of Identifiable instances, which are

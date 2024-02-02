@@ -15,6 +15,8 @@
 */
 package com.strategicgains.repoexpress.domain;
 
+import com.strategicgains.noschema.Identifiable;
+
 /**
  * @author seans
  * @since Aug 24, 2013

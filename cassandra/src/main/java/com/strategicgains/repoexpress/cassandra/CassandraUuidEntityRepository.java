@@ -28,6 +28,6 @@ extends CassandraEntityRepository<T>
 
     protected void initializeObservers()
     {
-		addObserver(new UuidEntityRepositoryObserver<T>());
+		addObserver(new UuidEntityRepositoryObserver<>());
     }
 }

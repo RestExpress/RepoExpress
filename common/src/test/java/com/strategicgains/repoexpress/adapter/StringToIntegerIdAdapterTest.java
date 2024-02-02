@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.strategicgains.repoexpress.domain.Identifier;
+import com.strategicgains.noschema.Identifier;
 import com.strategicgains.repoexpress.exception.InvalidObjectIdException;
 
 /**

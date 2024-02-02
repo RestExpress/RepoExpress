@@ -21,7 +21,7 @@ import java.util.UUID;
 
 import org.restexpress.common.util.StringUtils;
 
-import com.strategicgains.repoexpress.domain.Identifier;
+import com.strategicgains.noschema.Identifier;
 
 /**
  * An abstract class with static singleton references to common ID adapters.

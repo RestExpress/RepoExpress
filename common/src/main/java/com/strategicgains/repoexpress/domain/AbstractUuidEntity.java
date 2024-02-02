@@ -17,6 +17,9 @@ package com.strategicgains.repoexpress.domain;
 
 import java.util.UUID;
 
+import com.strategicgains.noschema.AbstractEntity;
+import com.strategicgains.noschema.Identifier;
+
 /**
  * An entity that is identified by a UUID as its primary identifier.
  * 

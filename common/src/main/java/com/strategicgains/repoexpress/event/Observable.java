@@ -17,7 +17,7 @@ package com.strategicgains.repoexpress.event;
 
 import java.util.List;
 
-import com.strategicgains.repoexpress.domain.Identifiable;
+import com.strategicgains.noschema.Identifiable;
 
 
 /**

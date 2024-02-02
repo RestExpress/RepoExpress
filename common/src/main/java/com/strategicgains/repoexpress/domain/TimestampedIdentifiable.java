@@ -15,6 +15,8 @@
 */
 package com.strategicgains.repoexpress.domain;
 
+import com.strategicgains.noschema.Identifiable;
+
 /**
  * @author toddf
  * @since Jan 22, 2010

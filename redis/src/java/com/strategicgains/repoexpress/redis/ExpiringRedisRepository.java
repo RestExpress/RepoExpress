@@ -1,9 +1,9 @@
 package com.strategicgains.repoexpress.redis;
 
-import redis.clients.jedis.JedisPool;
-
 import com.strategicgains.repoexpress.domain.ExpiringIdentifiable;
 import com.strategicgains.repoexpress.event.AbstractRepositoryObserver;
+
+import redis.clients.jedis.JedisPool;
 
 /**
  * This Redis repository extends RedisRepository and allows the persisted entities to set an

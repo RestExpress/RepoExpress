@@ -17,8 +17,8 @@ package com.strategicgains.repoexpress.util;
 
 import java.util.UUID;
 
+import com.strategicgains.noschema.Identifier;
 import com.strategicgains.repoexpress.adapter.Identifiers;
-import com.strategicgains.repoexpress.domain.Identifier;
 import com.strategicgains.repoexpress.exception.InvalidObjectIdException;
 
 /**

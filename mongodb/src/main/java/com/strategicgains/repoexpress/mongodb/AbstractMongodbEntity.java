@@ -16,10 +16,11 @@
 package com.strategicgains.repoexpress.mongodb;
 
 import org.bson.types.ObjectId;
-import dev.morphia.annotations.Id;
 
+import com.strategicgains.noschema.Identifier;
 import com.strategicgains.repoexpress.domain.AbstractTimestampedEntity;
-import com.strategicgains.repoexpress.domain.Identifier;
+
+import dev.morphia.annotations.Id;
 
 /**
  * An Entity object that is identified by a MongoDB ObjectId. It also has

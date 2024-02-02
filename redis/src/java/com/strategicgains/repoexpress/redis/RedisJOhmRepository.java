@@ -15,13 +15,13 @@
 */
 package com.strategicgains.repoexpress.redis;
 
-import redis.clients.johm.JOhm;
-
+import com.strategicgains.noschema.Identifiable;
+import com.strategicgains.noschema.Identifier;
 import com.strategicgains.repoexpress.AbstractObservableRepository;
-import com.strategicgains.repoexpress.domain.Identifiable;
-import com.strategicgains.repoexpress.domain.Identifier;
 import com.strategicgains.repoexpress.exception.DuplicateItemException;
 import com.strategicgains.repoexpress.exception.ItemNotFoundException;
+
+import redis.clients.johm.JOhm;
 
 /**
  * Persist objects (mainly sub-classes of AbstractRedisJOhmEntity) to a Redis datastore using JOhm.

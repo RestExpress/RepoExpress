@@ -17,11 +17,11 @@ package com.strategicgains.repoexpress.mongodb;
 
 import java.util.UUID;
 
-import dev.morphia.annotations.Id;
-
+import com.strategicgains.noschema.Identifier;
 import com.strategicgains.repoexpress.domain.AbstractTimestampedEntity;
-import com.strategicgains.repoexpress.domain.Identifier;
 import com.strategicgains.repoexpress.domain.UuidEntity;
+
+import dev.morphia.annotations.Id;
 
 /**
  * An MongoDB entity object that is identified by a UUID as its primary

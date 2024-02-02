@@ -15,8 +15,8 @@
 */
 package com.strategicgains.repoexpress.redis;
 
+import com.strategicgains.noschema.Identifier;
 import com.strategicgains.repoexpress.domain.AbstractTimestampedEntity;
-import com.strategicgains.repoexpress.domain.Identifier;
 
 import redis.clients.johm.Id;
 

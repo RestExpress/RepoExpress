@@ -15,16 +15,16 @@
  */
 package com.strategicgains.repoexpress.redis;
 
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-
+import com.strategicgains.noschema.Identifiable;
+import com.strategicgains.noschema.Identifier;
 import com.strategicgains.repoexpress.AbstractObservableRepository;
-import com.strategicgains.repoexpress.domain.Identifiable;
-import com.strategicgains.repoexpress.domain.Identifier;
 import com.strategicgains.repoexpress.event.AbstractRepositoryObserver;
 import com.strategicgains.repoexpress.exception.DuplicateItemException;
 import com.strategicgains.repoexpress.exception.ItemNotFoundException;
 import com.strategicgains.repoexpress.exception.RepositoryException;
+
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 /**
  * This Redis repository works on simpler objects than RedisJOhmRepository, in that, the persisted

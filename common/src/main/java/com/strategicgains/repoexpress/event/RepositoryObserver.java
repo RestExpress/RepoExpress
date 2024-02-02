@@ -15,8 +15,8 @@
 */
 package com.strategicgains.repoexpress.event;
 
-import com.strategicgains.repoexpress.domain.Identifiable;
-import com.strategicgains.repoexpress.domain.Identifier;
+import com.strategicgains.noschema.Identifiable;
+import com.strategicgains.noschema.Identifier;
 
 /**
  * @author toddf

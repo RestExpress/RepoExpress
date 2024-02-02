@@ -13,6 +13,14 @@
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
+	<dependencies>
+		<dependency>
+			<groupId>com.strategicgains.noschema</groupId>
+			<artifactId>core</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>

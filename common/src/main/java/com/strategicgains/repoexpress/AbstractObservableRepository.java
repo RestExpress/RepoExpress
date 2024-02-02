@@ -35,7 +35,7 @@ extends AbstractRepository<T>
 implements ObservableRepository<T>
 {
 	// SECTION: INSTANCE VARIABLES
-	
+
 	private List<RepositoryObserver<T>> observers = new ArrayList<RepositoryObserver<T>>();
 
 	
@@ -48,10 +48,11 @@ implements ObservableRepository<T>
 
 
 	// SECTION: ACCESSORS/MUTATORS
-	
-	public void addObserver(RepositoryObserver<T> observer)
+
+	public ObservableRepository<T> addObserver(RepositoryObserver<T> observer)
 	{
 		getObserversInternal().add(observer);
+		return this;
 	}
 	
 	/**

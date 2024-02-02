@@ -31,7 +31,7 @@ public interface Observable<T extends Identifiable>
 	 * 
 	 * @param observer
 	 */
-	public void addObserver(RepositoryObserver<T> observer);
+	public Observable<T> addObserver(RepositoryObserver<T> observer);
 
 	/**
      * Remove all observers from this observable.

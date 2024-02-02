@@ -35,5 +35,10 @@
 			<artifactId>java-driver-core</artifactId>
 			<version>${driver.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.strategicgains.noschema</groupId>
+			<artifactId>cassandra</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

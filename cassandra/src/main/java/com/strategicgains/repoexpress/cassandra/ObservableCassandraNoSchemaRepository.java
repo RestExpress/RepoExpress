@@ -9,6 +9,7 @@ import com.strategicgains.noschema.Identifiable;
 import com.strategicgains.noschema.Identifier;
 import com.strategicgains.noschema.cassandra.CassandraNoSchemaRepository;
 import com.strategicgains.noschema.cassandra.PrimaryTable;
+import com.strategicgains.noschema.document.ObjectCodec;
 import com.strategicgains.repoexpress.event.Observable;
 import com.strategicgains.repoexpress.event.RepositoryObserver;
 
@@ -16,11 +17,11 @@ public abstract class ObservableCassandraNoSchemaRepository<T extends Identifiab
 extends CassandraNoSchemaRepository<T>
 implements Observable<T>
 {
-	private List<RepositoryObserver<T>> observers = new ArrayList<RepositoryObserver<T>>();
+	private List<RepositoryObserver<T>> observers = new ArrayList<>();
 
-	public ObservableCassandraNoSchemaRepository(CqlSession session, PrimaryTable table)
+	ObservableCassandraNoSchemaRepository(CqlSession session, PrimaryTable table, ObjectCodec<T> codec)
 	{
-		super(session, table);
+		super(session, table, codec);
 	}
 
 	public Observable<T> addObserver(RepositoryObserver<T> observer)

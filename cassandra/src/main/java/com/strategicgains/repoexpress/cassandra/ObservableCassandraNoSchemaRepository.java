@@ -19,7 +19,7 @@ implements Observable<T>
 {
 	private List<RepositoryObserver<T>> observers = new ArrayList<>();
 
-	ObservableCassandraNoSchemaRepository(CqlSession session, PrimaryTable table, ObjectCodec<T> codec)
+	protected ObservableCassandraNoSchemaRepository(CqlSession session, PrimaryTable table, ObjectCodec<T> codec)
 	{
 		super(session, table, codec);
 	}

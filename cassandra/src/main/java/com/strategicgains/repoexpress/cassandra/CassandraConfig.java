@@ -38,11 +38,17 @@ public class CassandraConfig
 {
 	private static final String DEFAULT_PORT = "9042";
 	private static final String CONTACT_POINTS_PROPERTY = "cassandra.contactPoints";
+	private static final String ENVIRONMENT_CONTACT_POINTS = "CASSANDRA_CONTACT_POINTS";
 	private static final String PORT_PROPERTY = "cassandra.port";
+	private static final String ENVIRONMENT_PORT = "CASSANDRA_PORT";
 	private static final String KEYSPACE_PROPERTY = "cassandra.keyspace";
+	private static final String ENVIRONMENT_KEYSPACE = "CASSANDRA_KEYSPACE";
 	private static final String DATA_CENTER = "cassandra.dataCenter";
+	private static final String ENVIRONMENT_DATA_CENTER = "CASSANDRA_DATA_CENTER";
 	private static final String READ_CONSISTENCY_LEVEL = "cassandra.readConsistencyLevel";
+	private static final String ENVIRONMENT_READ_CONSISTENCY_LEVEL = "CASSANDRA_READ_CONSISTENCY_LEVEL";
 	private static final String WRITE_CONSISTENCY_LEVEL = "cassandra.writeConsistencyLevel";
+	private static final String ENVIRONMENT_WRITE_CONSISTENCY_LEVEL = "CASSANDRA_WRITE_CONSISTENCY_LEVEL";
 
 	private Collection<InetSocketAddress> contactPoints;
 	private String keyspace;
@@ -55,38 +61,36 @@ public class CassandraConfig
 
 	public CassandraConfig(Properties p)
 	{
-		port = Integer.parseInt(p.getProperty(PORT_PROPERTY, DEFAULT_PORT));
-		dataCenter = p.getProperty(DATA_CENTER);
-		readConsistencyLevel = DefaultConsistencyLevel.valueOf(p.getProperty(READ_CONSISTENCY_LEVEL, "LOCAL_QUORUM"));
-		writeConsistencyLevel = DefaultConsistencyLevel.valueOf(p.getProperty(WRITE_CONSISTENCY_LEVEL, "LOCAL_QUORUM"));
-		keyspace = p.getProperty(KEYSPACE_PROPERTY);
+		String portString = p.getProperty(ENVIRONMENT_PORT);
+		port = (portString != null) ? Integer.parseInt(portString) : Integer.parseInt(p.getProperty(PORT_PROPERTY, DEFAULT_PORT));
+		dataCenter = p.getProperty(ENVIRONMENT_DATA_CENTER, p.getProperty(DATA_CENTER));
+		readConsistencyLevel = DefaultConsistencyLevel.valueOf(p.getProperty(ENVIRONMENT_READ_CONSISTENCY_LEVEL, p.getProperty(READ_CONSISTENCY_LEVEL, "LOCAL_QUORUM")));
+		writeConsistencyLevel = DefaultConsistencyLevel.valueOf(p.getProperty(ENVIRONMENT_WRITE_CONSISTENCY_LEVEL, p.getProperty(WRITE_CONSISTENCY_LEVEL, "LOCAL_QUORUM")));
+		String contactPointsString = p.getProperty(ENVIRONMENT_CONTACT_POINTS, p.getProperty(CONTACT_POINTS_PROPERTY));
 
+		if (contactPointsString == null || contactPointsString.trim().isEmpty())
+		{
+			throw new ConfigurationException(
+			    "Please define Cassandra contact points (IP addresses) for property: "
+			        + CONTACT_POINTS_PROPERTY);
+		}
+		
+		contactPoints = Arrays.stream(contactPointsString.split(",\\s*"))
+				.map(s -> {
+					try {
+						return new InetSocketAddress(InetAddress.getByName(s), port);
+					} catch (UnknownHostException e) {
+						throw new ConfigurationException(e);
+					}
+				}).collect(Collectors.toList());
+
+		keyspace = p.getProperty(ENVIRONMENT_KEYSPACE, p.getProperty(KEYSPACE_PROPERTY));
 		if (keyspace == null || keyspace.trim().isEmpty())
 		{
 			throw new ConfigurationException(
 			    "Please define a Cassandra keyspace in property: "
 			        + KEYSPACE_PROPERTY);
 		}
-
-		String contactPointsCommaDelimited = p.getProperty(CONTACT_POINTS_PROPERTY);
-
-		if (contactPointsCommaDelimited == null || contactPointsCommaDelimited.trim().isEmpty())
-		{
-			throw new ConfigurationException(
-			    "Please define Cassandra contact points (IP addresses) for property: "
-			        + CONTACT_POINTS_PROPERTY);
-		}
-
-		contactPoints = Arrays.stream(contactPointsCommaDelimited.split(",\\s*")).map(s -> {
-			try
-			{
-				return new InetSocketAddress(InetAddress.getByName(s), port);
-			}
-			catch (UnknownHostException e)
-			{
-				throw new ConfigurationException(e);
-			}
-		}).collect(Collectors.toList());
 
 		initialize(p);
 	}

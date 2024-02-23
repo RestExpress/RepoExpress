@@ -12,6 +12,10 @@ import com.strategicgains.noschema.cassandra.PrimaryTable;
 import com.strategicgains.noschema.document.ObjectCodec;
 import com.strategicgains.repoexpress.event.Observable;
 import com.strategicgains.repoexpress.event.RepositoryObserver;
+import com.strategicgains.repoexpress.exception.DuplicateItemException;
+import com.strategicgains.repoexpress.exception.InvalidObjectIdException;
+import com.strategicgains.repoexpress.exception.ItemNotFoundException;
+import com.strategicgains.repoexpress.exception.RepositoryException;
 
 public abstract class ObservableCassandraNoSchemaRepository<T extends Identifiable>
 extends CassandraNoSchemaRepository<T>
@@ -56,36 +60,90 @@ implements Observable<T>
 	@Override
 	public T create(T entity)
 	{
-		observers.stream().forEach(o -> o.beforeCreate(entity));
-		T created = super.create(entity);
-		observers.stream().forEach(o -> o.afterCreate(entity));
-		return created;
+		try
+		{
+			observers.stream().forEach(o -> o.beforeCreate(entity));
+			T created = super.create(entity);
+			observers.stream().forEach(o -> o.afterCreate(entity));
+			return created;
+		}
+		catch (Exception e)
+		{
+			mapException(e);
+		}
+
+		return null; // won't get here.
 	}
 
 	@Override
 	public void delete(Identifier id)
 	{
-		T entity = read(id);
-		observers.stream().forEach(o -> o.beforeDelete(entity));
-		super.delete(id);
-		observers.stream().forEach(o -> o.afterDelete(entity));
+		try
+		{
+			T entity = read(id);
+			observers.stream().forEach(o -> o.beforeDelete(entity));
+			super.delete(id);
+			observers.stream().forEach(o -> o.afterDelete(entity));
+		}
+		catch (Exception e)
+		{
+			mapException(e);
+		}
 	}
 
 	@Override
 	public T update(T entity, T original)
 	{
-		observers.stream().forEach(o -> o.beforeUpdate(original));
-		T updated = super.update(entity, original);
-		observers.stream().forEach(o -> o.afterUpdate(updated));
-		return updated;
+		try
+		{
+			observers.stream().forEach(o -> o.beforeUpdate(original));
+			T updated = super.update(entity, original);
+			observers.stream().forEach(o -> o.afterUpdate(updated));
+			return updated;
+		}
+		catch (Exception e)
+		{
+			mapException(e);
+		}
+
+		return null; // won't get here.
 	}
 
 	@Override
 	public T upsert(T entity)
 	{
-		observers.stream().forEach(o -> o.beforeUpdate(entity));
-		T updated = super.upsert(entity);
-		observers.stream().forEach(o -> o.afterUpdate(updated));
-		return updated;
+		try
+		{
+			observers.stream().forEach(o -> o.beforeUpdate(entity));
+			T updated = super.upsert(entity);
+			observers.stream().forEach(o -> o.afterUpdate(updated));
+			return updated;
+		}
+		catch (Exception e)
+		{
+			mapException(e);
+		}
+
+		return null; // won't get here.
 	}
+
+	private void mapException(Exception e)
+    {
+		if (e instanceof com.strategicgains.noschema.exception.DuplicateItemException)
+		{
+			throw new DuplicateItemException(e.getMessage());
+		}
+		else if (e instanceof com.strategicgains.noschema.exception.ItemNotFoundException)
+		{
+			throw new ItemNotFoundException(e.getMessage());
+		}
+		else if (e instanceof com.strategicgains.noschema.exception.InvalidObjectIdException)
+		{
+			throw new InvalidObjectIdException(e.getMessage());
+		}
+		else if (e instanceof com.strategicgains.noschema.exception.StorageException)
+		{
+			throw new RepositoryException(e.getMessage());
+		}
+    }
 }

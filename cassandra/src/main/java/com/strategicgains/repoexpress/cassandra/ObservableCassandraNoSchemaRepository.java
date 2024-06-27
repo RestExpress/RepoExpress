@@ -7,7 +7,7 @@ import java.util.List;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.strategicgains.noschema.Identifiable;
 import com.strategicgains.noschema.Identifier;
-import com.strategicgains.noschema.cassandra.CassandraNoSchemaRepository;
+import com.strategicgains.noschema.cassandra.CassandraRepository;
 import com.strategicgains.noschema.cassandra.PrimaryTable;
 import com.strategicgains.noschema.document.ObjectCodec;
 import com.strategicgains.repoexpress.event.Observable;
@@ -18,7 +18,7 @@ import com.strategicgains.repoexpress.exception.ItemNotFoundException;
 import com.strategicgains.repoexpress.exception.RepositoryException;
 
 public abstract class ObservableCassandraNoSchemaRepository<T extends Identifiable>
-extends CassandraNoSchemaRepository<T>
+extends CassandraRepository<T>
 implements Observable<T>
 {
 	private List<RepositoryObserver<T>> observers = new ArrayList<>();

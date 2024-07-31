@@ -7,7 +7,7 @@ import java.util.List;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.strategicgains.noschema.Identifiable;
 import com.strategicgains.noschema.Identifier;
-import com.strategicgains.noschema.cassandra.CassandraNoSchemaRepository;
+import com.strategicgains.noschema.cassandra.CassandraRepository;
 import com.strategicgains.noschema.cassandra.PrimaryTable;
 import com.strategicgains.noschema.document.ObjectCodec;
 import com.strategicgains.repoexpress.event.Observable;
@@ -17,13 +17,13 @@ import com.strategicgains.repoexpress.exception.InvalidObjectIdException;
 import com.strategicgains.repoexpress.exception.ItemNotFoundException;
 import com.strategicgains.repoexpress.exception.RepositoryException;
 
-public abstract class ObservableCassandraNoSchemaRepository<T extends Identifiable>
-extends CassandraNoSchemaRepository<T>
+public abstract class CassandraNoSchemaRepository<T extends Identifiable>
+extends CassandraRepository<T>
 implements Observable<T>
 {
 	private List<RepositoryObserver<T>> observers = new ArrayList<>();
 
-	protected ObservableCassandraNoSchemaRepository(CqlSession session, PrimaryTable table, ObjectCodec<T> codec)
+	protected CassandraNoSchemaRepository(CqlSession session, PrimaryTable table, ObjectCodec<T> codec)
 	{
 		super(session, table, codec);
 	}

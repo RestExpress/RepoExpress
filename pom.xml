@@ -17,6 +17,7 @@
 
 	<modules>
 		<module>common</module>
+		<module>jdbc</module>
 		<module>mongodb</module>
 		<module>redis</module>
 		<module>cassandra</module>

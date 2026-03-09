@@ -30,6 +30,7 @@ import org.jooq.Record;
 import org.jooq.SQLDialect;
 import org.jooq.SelectQuery;
 import org.jooq.SortField;
+import org.jooq.Table;
 import org.jooq.UpdateQuery;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -278,6 +279,77 @@ implements Queryable<T>
 	protected JdbcEntityDefinition<T> getDefinition()
 	{
 		return definition;
+	}
+
+	/**
+	 * Resolve a mapped field by logical name from the entity definition.
+	 * Intended for subclass query methods.
+	 *
+	 * @param logicalFieldName the logical query field name defined in the mapping.
+	 * @return mapped jOOQ field
+	 * @throws RepositoryException if the field is not mapped
+	 */
+	protected Field<?> field(String logicalFieldName)
+	{
+		return requireField(logicalFieldName);
+	}
+
+	/**
+	 * Resolve a mapped field by logical name and cast it to the desired Java type.
+	 * Intended for subclass query methods.
+	 */
+	@SuppressWarnings("unchecked")
+	protected <V> Field<V> field(String logicalFieldName, Class<V> type)
+	{
+		return (Field<V>) requireField(logicalFieldName).cast(type);
+	}
+
+	/**
+	 * Expose the mapped table for subclass query methods.
+	 */
+	protected Table<?> table()
+	{
+		return definition.table();
+	}
+
+	/**
+	 * Read a single item by an arbitrary condition, returning null when not found.
+	 * Intended for alternate-key lookup methods in subclasses.
+	 */
+	protected T readOneByOrNull(Condition condition)
+	{
+		try
+		{
+			Record record = dsl.selectFrom(definition.table())
+				.where(condition)
+				.limit(1)
+				.fetchOne();
+
+			return (record == null ? null : definition.fromRecord(record));
+		}
+		catch (DataAccessException e)
+		{
+			throw JdbcExceptionTranslator.toRepositoryException("Unable to read item by custom condition", e);
+		}
+	}
+
+	/**
+	 * Read a single item by an arbitrary condition.
+	 *
+	 * @throws ItemNotFoundException if no matching row exists.
+	 */
+	protected T readOneBy(Condition condition, String notFoundMessage)
+	{
+		T found = readOneByOrNull(condition);
+
+		if (found == null)
+		{
+			throw new ItemNotFoundException((notFoundMessage == null || notFoundMessage.trim().isEmpty())
+				? "Item not found"
+				: notFoundMessage);
+		}
+
+		return found;
 	}
 
 	@SuppressWarnings("unchecked")

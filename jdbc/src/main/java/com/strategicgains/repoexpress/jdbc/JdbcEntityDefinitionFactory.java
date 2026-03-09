@@ -38,6 +38,7 @@ import com.strategicgains.repoexpress.exception.RepositoryException;
 import com.strategicgains.repoexpress.jdbc.annotation.Entity;
 import com.strategicgains.repoexpress.jdbc.annotation.Id;
 import com.strategicgains.repoexpress.jdbc.annotation.Property;
+import com.strategicgains.repoexpress.jdbc.annotation.Transient;
 
 /**
  * Builds {@link JdbcEntityDefinition} instances from RepoExpress JDBC annotations.
@@ -72,8 +73,8 @@ public final class JdbcEntityDefinitionFactory
 		}
 
 		JdbcEntityDefinition<T> created = new ReflectionJdbcEntityDefinition<T>(entityClass);
-		JdbcEntityDefinition<?> previous = CACHE.putIfAbsent(entityClass, created);
-		return (JdbcEntityDefinition<T>) (previous == null ? created : previous);
+		CACHE.put(entityClass, created);
+		return created;
 	}
 
 	private static final class ReflectionJdbcEntityDefinition<T extends Identifiable>
@@ -238,7 +239,7 @@ public final class JdbcEntityDefinitionFactory
 					{
 						if (Modifier.isStatic(field.getModifiers())) continue;
 						if (Modifier.isTransient(field.getModifiers())) continue;
-						if (field.isAnnotationPresent(com.strategicgains.repoexpress.jdbc.annotation.Transient.class)) continue;
+						if (field.isAnnotationPresent(Transient.class)) continue;
 
 					Property property = field.getAnnotation(Property.class);
 					Id id = field.getAnnotation(Id.class);

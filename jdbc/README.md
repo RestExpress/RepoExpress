@@ -62,12 +62,118 @@ These are RepoExpress-owned annotations (not Morphia, not JPA):
 - `com.strategicgains.repoexpress.jdbc.annotation.Property`
 - `com.strategicgains.repoexpress.jdbc.annotation.Transient`
 
-### Notes
+### Annotation Reference
 
-- Java `transient` fields are also ignored by `JdbcEntityDefinitionFactory`.
-- `@Id(order=...)` supports composite identifiers.
-- `@Property(value="column_name")` maps a field to a SQL column.
-- `@Property(queryName="...")` exposes a logical field name for `QueryFilter`/`QueryOrder`.
+#### `@Entity`
+
+Declares the table-level mapping for a POJO.
+
+Attributes:
+- `table`:
+  - Physical table name.
+  - Preferred attribute for clarity in relational code.
+  - Default: empty string.
+- `value`:
+  - Alias for `table` (included for Morphia-style familiarity).
+  - Used only when `table` is empty.
+  - Default: empty string.
+- `schema`:
+  - Optional schema qualifier.
+  - When set, generated table metadata is schema-qualified.
+  - Default: empty string.
+
+Validation:
+- Exactly one class-level `@Entity` is expected for annotation-driven mapping.
+- At least one of `table` or `value` must be set.
+
+#### `@Id`
+
+Marks a field as part of the primary identifier.
+
+Attributes:
+- `order`:
+  - Component order for composite identifiers.
+  - Default: `0`.
+
+Behavior:
+- One `@Id` field: simple key.
+- Multiple `@Id` fields: composite key ordered by ascending `order`.
+- Duplicate `order` values are invalid.
+- `@Id` fields are excluded from updates (`updateValues`) by the factory.
+
+#### `@Property`
+
+Maps a field to a physical column and controls query/insert/update participation.
+
+Attributes:
+- `value`:
+  - Physical column name.
+  - If empty, Java field name is used.
+  - Default: empty string.
+- `queryName`:
+  - Logical field name used in repository queries (`field("...")`) and dynamic queries.
+  - Supports dotted names (for example `account.id`) so Mongo-style logical paths can be preserved.
+  - If empty, Java field name is used.
+  - Default: empty string.
+- `queryable`:
+  - Exposes field for filtering lookup.
+  - Default: `true`.
+- `sortable`:
+  - Exposes field for ordering lookup.
+  - Default: `true`.
+- `insertable`:
+  - Includes field in generated insert values.
+  - Set `false` for DB-generated values.
+  - Default: `true`.
+- `updatable`:
+  - Includes field in generated update values.
+  - Default: `true`.
+  - Note: `@Id` fields are never updated even if set `true`.
+
+Validation:
+- Duplicate physical column names are invalid.
+- Duplicate logical names (`queryName` / derived logical name) among queryable/sortable fields are invalid.
+
+#### `@Transient`
+
+Excludes a field from JDBC mapping metadata.
+
+Behavior:
+- Field is omitted from:
+  - insert values
+  - update values
+  - record hydration
+  - query/sort lookup exposure
+- Java `transient` modifier has the same effect.
+
+### Mapping Defaults and Factory Rules
+
+`JdbcEntityDefinitionFactory` applies these defaults when generating definitions:
+- If `@Property.value` is empty, column name defaults to Java field name.
+- If `@Property.queryName` is empty, logical name defaults to Java field name.
+- If a field has `@Id` only (no `@Property`), it is still mapped.
+- Static fields are ignored.
+- Java `transient` and `@Transient` fields are ignored.
+- A no-arg constructor is required for entity hydration from jOOQ `Record`.
+
+### Queryability and Logical Paths
+
+Queryable/sortable behavior is based on logical names, not Java object graph traversal.
+
+Example:
+
+```java
+@Property(value = "account_id", queryName = "account.id", queryable = true, sortable = false)
+private UUID accountId;
+```
+
+Then in repository code:
+
+```java
+field("account.id", UUID.class).eq(accountId)
+```
+
+This preserves a Mongo-style logical API while still mapping to flat SQL columns.
 
 ## Example Entity
 
@@ -163,6 +269,27 @@ extends JdbcRepository<User>
 	public UserRepository(JdbcConfig config)
 	{
 		super(config, SQLDialect.POSTGRES, User.class);
+	}
+}
+```
+
+Alternate-key query methods in subclasses can use `field(...)`, `table()`, and `readOneBy...(...)`:
+
+```java
+public class LinkRepository extends JdbcRepository<Link>
+{
+	public LinkRepository(JdbcConfig config)
+	{
+		super(config, SQLDialect.POSTGRES, Link.class);
+	}
+
+	public Link readByAlias(UUID accountId, String alias)
+	{
+		return readOneBy(
+			field("accountId", UUID.class).eq(accountId)
+				.and(field("alias", String.class).eq(alias)),
+			"Link alias not found for accountId=" + accountId + ", alias=" + alias
+		);
 	}
 }
 ```

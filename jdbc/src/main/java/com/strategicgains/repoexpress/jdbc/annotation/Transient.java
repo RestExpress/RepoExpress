@@ -22,6 +22,8 @@ import java.lang.annotation.Target;
 
 /**
  * Excludes a field from JDBC mapping metadata.
+ * <p/>
+ * Fields marked with Java's {@code transient} modifier are also excluded.
  *
  * @author toddf
  * @since Feb 26, 2026

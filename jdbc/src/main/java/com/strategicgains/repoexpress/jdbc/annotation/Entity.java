@@ -22,7 +22,17 @@ import java.lang.annotation.Target;
 
 /**
  * Declares the relational table mapping for a RepoExpress JDBC entity.
- * {@code value()} is an alias for {@code table()} for Morphia-style familiarity.
+ * <p/>
+ * Use on the entity class once. The table name is required and may be supplied
+ * via either {@link #table()} or {@link #value()}.
+ * <p/>
+ * Resolution order:
+ * <ol>
+ * <li>{@code table()}</li>
+ * <li>{@code value()}</li>
+ * </ol>
+ * If neither is set, {@code JdbcEntityDefinitionFactory} throws a
+ * {@code RepositoryException}.
  *
  * @author toddf
  * @since Feb 26, 2026
@@ -31,9 +41,26 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Entity
 {
+	/**
+	 * Alias for {@link #table()} for Morphia-style familiarity.
+	 * Prefer {@link #table()} for clarity in relational code.
+	 *
+	 * @return mapped table name alias.
+	 */
 	public String value() default "";
 
+	/**
+	 * Physical database table name.
+	 *
+	 * @return mapped table name.
+	 */
 	public String table() default "";
 
+	/**
+	 * Optional schema/catalog qualifier used in generated table metadata.
+	 * If empty, the table is unqualified.
+	 *
+	 * @return optional schema name.
+	 */
 	public String schema() default "";
 }

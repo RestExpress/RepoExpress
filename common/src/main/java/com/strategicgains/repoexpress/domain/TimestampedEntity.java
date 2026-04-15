@@ -15,7 +15,7 @@
 */
 package com.strategicgains.repoexpress.domain;
 
-import com.strategicgains.noschema.Entity;
+import com.strategicgains.noschema.entity.Entity;
 
 /**
  * @author toddf

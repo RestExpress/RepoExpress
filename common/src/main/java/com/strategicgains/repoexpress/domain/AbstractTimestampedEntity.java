@@ -17,7 +17,7 @@ package com.strategicgains.repoexpress.domain;
 
 import java.util.Date;
 
-import com.strategicgains.noschema.AbstractEntity;
+import com.strategicgains.noschema.entity.AbstractEntity;
 
 public abstract class AbstractTimestampedEntity<T>
 extends AbstractEntity<T>

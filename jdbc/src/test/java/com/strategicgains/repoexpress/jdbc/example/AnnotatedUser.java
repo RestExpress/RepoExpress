@@ -15,8 +15,8 @@
 */
 package com.strategicgains.repoexpress.jdbc.example;
 
-import com.strategicgains.noschema.AbstractEntity;
 import com.strategicgains.noschema.Identifier;
+import com.strategicgains.noschema.entity.AbstractEntity;
 import com.strategicgains.repoexpress.jdbc.annotation.Entity;
 import com.strategicgains.repoexpress.jdbc.annotation.Id;
 import com.strategicgains.repoexpress.jdbc.annotation.Property;

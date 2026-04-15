@@ -15,9 +15,9 @@
 */
 package com.strategicgains.repoexpress.redis;
 
-import com.strategicgains.noschema.AbstractEntity;
 import com.strategicgains.noschema.Identifiable;
 import com.strategicgains.noschema.Identifier;
+import com.strategicgains.noschema.entity.AbstractEntity;
 
 /**
  * This super-class implements the Identifiable interface by using a String ID.

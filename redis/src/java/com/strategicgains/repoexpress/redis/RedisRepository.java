@@ -31,7 +31,7 @@ import redis.clients.jedis.JedisPool;
  * entities must only implement Identifiable and can have String types as their ID.
  * <p/>
  * Note that this repository requires the client to set appropriate ID values.  Otherwise, since
- * this repository is 'observable', a RepositoryObserver may be used to perform that task automatically
+ * this repository is 'observable', a EntityObserver may be used to perform that task automatically
  * on a create operation if desired.
  * <p/>
  * Usage of this repository requires de/serialization to occur during the persistence operation.

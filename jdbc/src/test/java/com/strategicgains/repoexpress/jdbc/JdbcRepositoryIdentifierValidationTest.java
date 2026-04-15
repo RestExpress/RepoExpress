@@ -28,8 +28,8 @@ import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.junit.Test;
 
-import com.strategicgains.noschema.AbstractEntity;
 import com.strategicgains.noschema.Identifier;
+import com.strategicgains.noschema.entity.AbstractEntity;
 import com.strategicgains.repoexpress.exception.InvalidObjectIdException;
 
 public class JdbcRepositoryIdentifierValidationTest

@@ -17,7 +17,7 @@ package com.strategicgains.repoexpress.domain;
 
 import java.util.UUID;
 
-import com.strategicgains.noschema.Entity;
+import com.strategicgains.noschema.entity.Entity;
 
 /**
  * @author toddf

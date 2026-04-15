@@ -20,8 +20,8 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-import com.strategicgains.noschema.AbstractEntity;
 import com.strategicgains.noschema.Identifier;
+import com.strategicgains.noschema.entity.AbstractEntity;
 import com.strategicgains.repoexpress.exception.RepositoryException;
 import com.strategicgains.repoexpress.jdbc.annotation.Entity;
 import com.strategicgains.repoexpress.jdbc.annotation.Id;
